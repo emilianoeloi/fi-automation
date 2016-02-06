@@ -48,6 +48,39 @@ var checkSetting = function(portfolioCurrentTime, exists, nonExists){
 		}
 	});
 }
+
+var prepareStockToSave = function(stock){
+	console.log('prepareStockToSave',stock);
+	delete stock['buyAction'];
+	delete stock['shellAction'];
+	stock.qtd = Number(stock.qtd.replace('.',''));
+	stock.medium = Number(stock.medium.replace(',','.'));
+	stock.current = Number(stock.current.replace(',','.'));
+	stock.total = Number(stock.total.replace('.','').replace(',','.'));
+	stock.variation = Number(stock.variation.replace('.','').replace(',','.'));
+	stock.rate = Number(stock.rate.replace(',','.'));
+	prepareStockShellValues(stock);
+	return stock;
+}
+var createShell = function(mediumPrice, gainPercent){
+	var shell = {}
+	shell.percent = gainPercent;
+	shell.gainValue = mediumPrice * gainPercent;
+	shell.shellPrice = mediumPrice + shell.gainValue;
+	return shell;
+}
+var prepareStockShellValues = function(stock){
+	stock.shellList =[];
+	stock.shellList.push(createShell(stock.medium, 0.05));
+	stock.shellList.push(createShell(stock.medium, 0.15));
+	stock.shellList.push(createShell(stock.medium, 0.30));
+}
+var preparePortfolioToSave = function(portfolio){
+	for(var index in portfolio){
+		prepareStockToSave(portfolio[index]);
+	}
+	console.log(portfolio);
+}
 	
 /* PORTFOLIO */
 var portfolioRoute = "/portfolio";
@@ -58,6 +91,7 @@ modules.app.post(rootRote+portfolioRoute, function(req, res) {
 	checkSetting(req.body.currentTime, function(){
 		res.json(302);
 	}, function(){
+		preparePortfolioToSave(portfolio);
 		modules.collection.portfolio.insert(pToSave, function(err, doc){
 		if(err){
 			res.json(500, err);
