@@ -17,7 +17,7 @@ var getTimeDescription = function(){
         mm='0'+mm
     } 
 
-    return mm+'/'+dd+'/'+yyyy;
+    return mm+'_'+dd+'_'+yyyy;
 } 
 var saveSetting = function(portfolioCurrentTime){
 	var locaPortfolioCurrentTime = getTimeDescription();
@@ -64,7 +64,7 @@ var prepareStockToSave = function(stock){
 }
 var createShell = function(mediumPrice, gainPercent){
 	var shell = {}
-	shell.percent = gainPercent;
+	shell.percent = (gainPercent * 100) + '%';
 	shell.gainValue = mediumPrice * gainPercent;
 	shell.shellPrice = mediumPrice + shell.gainValue;
 	return shell;
@@ -76,22 +76,33 @@ var prepareStockShellValues = function(stock){
 	stock.shellList.push(createShell(stock.medium, 0.30));
 }
 var preparePortfolioToSave = function(portfolio){
-	for(var index in portfolio){
-		prepareStockToSave(portfolio[index]);
+	for(var index in portfolio.stocks){
+		prepareStockToSave(portfolio.stocks[index]);
+		portfolio.stocks[index].timeKey = portfolio.timeKey;
+		saveStock(portfolio.stocks[index]);
 	}
-	console.log(portfolio);
+}
+
+var saveStock = function(stock){
+	modules.collection.stock.update(
+			{"code": stock.code},
+			stock,
+			{upsert:true}
+		);
 }
 	
 /* PORTFOLIO */
 var portfolioRoute = "/portfolio";
 modules.app.post(rootRote+portfolioRoute, function(req, res) { 
-	console.log(req.body.currentTime);
 	var portfolio = JSON.parse(req.body.portfolio);
-	var pToSave = {"portfolio":portfolio};
+	var pToSave = {
+		"timeKey": req.body.currentTime,
+		"stocks":portfolio
+	};
 	checkSetting(req.body.currentTime, function(){
 		res.json(302);
 	}, function(){
-		preparePortfolioToSave(portfolio);
+		preparePortfolioToSave(pToSave);
 		modules.collection.portfolio.insert(pToSave, function(err, doc){
 		if(err){
 			res.json(500, err);
@@ -119,3 +130,26 @@ modules.app.put(rootRote+portfolioRoute, function(req, res) {
 
 /* STOCK */
 var stockRoute = "/stock";
+modules.app.get(rootRote+stockRoute, function(req, res) { 
+	modules.collection.stock.find({}, function(err, doc){
+		if(err){
+			res.json(500, err);
+		}else{
+			res.json(doc);
+		}
+	}); 
+});
+modules.app.get(rootRote+stockRoute+'/:timeKey/:code', function(req, res) {
+	var timeKey = req.params.timeKey;
+	var code = req.params.code; 
+	modules.collection.stock.find({
+		"timeKey": timeKey,
+		"code": code
+	}, function(err, doc){
+		if(err){
+			res.json(500, err);
+		}else{
+			res.json(doc[0]);
+		}
+	}); 
+});
