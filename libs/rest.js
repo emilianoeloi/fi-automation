@@ -19,22 +19,18 @@ var getTimeDescription = function(){
 
     return mm+'_'+dd+'_'+yyyy;
 } 
-var saveSetting = function(portfolioCurrentTime){
-	var locaPortfolioCurrentTime = getTimeDescription();
-	modules.collection.setting.insert({
-		"server": locaPortfolioCurrentTime,
-		"request": portfolioCurrentTime,
-		"name": "PORTFOLIO"
-	}, function(err, doc){
+function nextFriday() {
+    return "12/02/2016";
+}
+var saveSetting = function(query, settingName){
+	query.server = getTimeDescription();
+	modules.collection.setting.insert(query, function(err, doc){
 
 	});
 }
 
-var checkSetting = function(portfolioCurrentTime, exists, nonExists){
-	modules.collection.setting.find({
-		"request":portfolioCurrentTime,
-		"name": "PORTFOLIO"
-	}, function(err, doc){
+var checkSetting = function(query,  exists, nonExists){
+	modules.collection.setting.find(query, function(err, doc){
 		if(err){
 			nonExists();
 		}else{
@@ -43,7 +39,7 @@ var checkSetting = function(portfolioCurrentTime, exists, nonExists){
 				exists();
 			}else{
 				nonExists();
-				saveSetting(portfolioCurrentTime);
+				saveSetting(query);
 			}
 		}
 	});
@@ -52,28 +48,31 @@ var checkSetting = function(portfolioCurrentTime, exists, nonExists){
 var prepareStockToSave = function(stock){
 	console.log('prepareStockToSave',stock);
 	delete stock['buyAction'];
-	delete stock['shellAction'];
+	delete stock['sellAction'];
 	stock.qtd = Number(stock.qtd.replace('.',''));
 	stock.medium = Number(stock.medium.replace(',','.'));
 	stock.current = Number(stock.current.replace(',','.'));
 	stock.total = Number(stock.total.replace('.','').replace(',','.'));
 	stock.variation = Number(stock.variation.replace('.','').replace(',','.'));
 	stock.rate = Number(stock.rate.replace(',','.'));
-	prepareStockShellValues(stock);
+	prepareStockSellValues(stock);
 	return stock;
 }
-var createShell = function(mediumPrice, gainPercent){
-	var shell = {}
-	shell.percent = (gainPercent * 100) + '%';
-	shell.gainValue = mediumPrice * gainPercent;
-	shell.shellPrice = mediumPrice + shell.gainValue;
-	return shell;
+var createSell = function(stock, gainPercent,  qtdPercent){
+	var sell = {}
+	sell.qtdPercent = (qtdPercent * 100) + '%';
+	sell.gainPercent = (gainPercent * 100) + '%';
+	sell.qtdValue = parseInt(stock.qtd * qtdPercent);
+	sell.gainValue = stock.medium * gainPercent;
+	sell.sellPrice = Number((stock.medium + sell.gainValue).toFixed(2));
+	sell.expireDate = nextFriday();
+	return sell;
 }
-var prepareStockShellValues = function(stock){
-	stock.shellList =[];
-	stock.shellList.push(createShell(stock.medium, 0.05));
-	stock.shellList.push(createShell(stock.medium, 0.15));
-	stock.shellList.push(createShell(stock.medium, 0.30));
+var prepareStockSellValues = function(stock){
+	stock.sellList =[];
+	stock.sellList.push(createSell(stock, 0.05,0.25));
+	stock.sellList.push(createSell(stock, 0.15,0.25));
+	stock.sellList.push(createSell(stock, 0.30,0.5));
 }
 var preparePortfolioToSave = function(portfolio){
 	for(var index in portfolio.stocks){
@@ -99,7 +98,10 @@ modules.app.post(rootRote+portfolioRoute, function(req, res) {
 		"timeKey": req.body.currentTime,
 		"stocks":portfolio
 	};
-	checkSetting(req.body.currentTime, function(){
+	checkSetting({
+		"timeKey":req.body.currentTime,
+		"name": "PORTFOLIO"
+	}, function(){
 		res.json(302);
 	}, function(){
 		preparePortfolioToSave(pToSave);
@@ -141,15 +143,26 @@ modules.app.get(rootRote+stockRoute, function(req, res) {
 });
 modules.app.get(rootRote+stockRoute+'/:timeKey/:code', function(req, res) {
 	var timeKey = req.params.timeKey;
-	var code = req.params.code; 
-	modules.collection.stock.find({
+	var code = req.params.code;
+
+	checkSetting({
 		"timeKey": timeKey,
-		"code": code
-	}, function(err, doc){
-		if(err){
-			res.json(500, err);
-		}else{
-			res.json(doc[0]);
-		}
-	}); 
+		"code": code,
+		"name": "STOCK"
+	}, function(){
+		res.json(404);
+	}, function(){
+		modules.collection.stock.find({
+			"timeKey": timeKey,
+			"code": code
+		}, function(err, doc){
+			if(err){
+				res.json(500, err);
+			}else{
+				res.json(doc[0]);
+			}
+		}); 
+	});
+
+	
 });

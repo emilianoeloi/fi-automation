@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         CARTEIRA
+// @name         VENDER
 // @namespace    http://folhainvest.folha.uol.com.br
 // @version      0.0.1
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
-// @include      http://folhainvest.folha.uol.com.br/carteira
+// @include      http://folhainvest.folha.uol.com.br/vender*
 // @connect      *
 // @grant GM_setValue
 // @grant GM_getValue
@@ -71,7 +71,6 @@ with({$: HTTPRequest.prototype}){
     };
 }
 
-
 var r = new HTTPRequest;
 
 var getTimeDescription = function(){
@@ -89,49 +88,71 @@ var getTimeDescription = function(){
     } 
 
     return mm+'_'+dd+'_'+yyyy;
-}    
-
-var savePortfolio = function(portfolio){
-    r.post("http://emiliano.bocamuchas.org:5000/api/1.0/portfolio", 
-           {"currentTime": getTimeDescription(), "portfolio": JSON.stringify(portfolio)}, function(msg){
-       console.log('savePortfolio',msg);
-    });
 }
 
-var clickSell = function(index){
-   if(carteira[index] == undefined){
-       return;
-   }
-   carteira[index].sellAction.click();
-    index++;
-   setTimeout(function(){
-       clickSell(index);
-   },2000);
-}
-var carteira = [];
-var table = document.querySelector(".fiTable")
-for (var i = 1, row; row = table.rows[i]; i++) {
-    var papel = {};
-    papel.code = row.cells[0].childNodes[0].innerHTML; 
-    if(papel.code == "Total"){
-        break;
+var fns = ['start_stop',
+'sell',
+'orderBalance',
+'user_balance',
+'transactions_total:',
+'company',
+'pricing',
+'value',
+'quantity',
+'expiration_date',
+'execute.x',
+'execute.y',
+'execute'];
+var received = false;
+var f = {};
+var loadFields = function(){
+    for(var index in fns){
+        var fn = fns[index];
+        f[fn] = document.getElementsByName(fn)[0];
     }
-    papel.name = row.cells[1].innerHTML;
-    papel.buyAction = row.cells[2].childNodes[0].childNodes[0];
-    papel.sellAction = row.cells[3].childNodes[0].childNodes[0];
-    papel.qtd = row.cells[4].innerHTML;
-    papel.medium = row.cells[5].innerHTML;
-    papel.current = row.cells[6].innerHTML;
-    papel.total = row.cells[7].innerHTML;
-    papel.variation = row.cells[8].innerHTML;
-    papel.rate = row.cells[9].innerHTML;
-    
-    papel.buyAction.setAttribute('target','_blank');
-    papel.sellAction.setAttribute('target','_blank');
-    
-    carteira.push(papel);
-    
+    f.frm = document.getElementById("transaction");
+    f.frm.setAttribute('target', '_blank');
+
+};
+var checkSelectedCompany = function(){
+    if(f.company.value == ""){
+        setTimeout(function(){
+            checkSelectedCompany();
+        }, 5000);
+    }else{
+        console.log('start shell');
+        loadStock(f.company.value);
+    }
 }
-savePortfolio(carteira);
-clickSell(0);
-// console.log(carteira);
+var loadStock = function(stockCode){
+   r.get('http://emiliano.bocamuchas.org:5000/api/1.0/stock/'+getTimeDescription()+'/'+stockCode, 
+         {},
+         function(a, b, c){
+            if(!received){
+              console.log('Stock', JSON.parse(a.responseText));
+                sendSell(JSON.parse(a.responseText).sellList, 0);
+              received = true;  
+            }    
+         });
+}
+var sendSell = function(sellList, index){
+    next = index +1;
+    var sell = sellList[index];
+    if (sell == undefined){
+        return;
+    }
+    console.info(index, next, sell);
+
+    setTimeout(function(){
+        f.value.value = sell.sellPrice;
+        f.quantity.value = sell.qtdValue;
+        f.pricing.checked = true;
+        f.expiration_date.value = sell.expireDate;
+        setTimeout(function(){
+            f.execute.click();
+            sendSell(sellList, next);   
+        }, 2000);
+    },2000);
+}
+loadFields();
+checkSelectedCompany();
