@@ -73,8 +73,26 @@ with({$: HTTPRequest.prototype}){
 
 var r = new HTTPRequest;
 
+var getTimeDescription = function(){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if(dd<10) {
+        dd='0'+dd
+    } 
+
+    if(mm<10) {
+        mm='0'+mm
+    } 
+
+    return mm+'/'+dd+'/'+yyyy;
+}    
+
 var savePortfolio = function(portfolio){
-    r.post("http://emiliano.bocamuchas.org:5000/api/1.0/portfolio", {"portfolio": JSON.stringify(portfolio)}, function(msg){
+    r.post("http://emiliano.bocamuchas.org:5000/api/1.0/portfolio", 
+           {"currentTime": getTimeDescription(), "portfolio": JSON.stringify(portfolio)}, function(msg){
        console.log('savePortfolio',msg);
     });
 }

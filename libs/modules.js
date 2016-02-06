@@ -5,9 +5,10 @@ var http = require('http'),
     mongo = require('mongodb'),
     monk = require('monk'),
     db = monk('localhost:27017/firefoxos');
-
-var portfolioCollection = db.get('portfolio');
-var stockCollection = db.get('stock');
+var collectionPrefix = "dev1";
+var portfolioCollection = db.get(collectionPrefix+'portfolio');
+var stockCollection = db.get(collectionPrefix+'stock');
+var settingCollection = db.get(collectionPrefix+'setting');
 
 var enableCORS = function (req, res, next) {
     
@@ -40,6 +41,7 @@ module.exports = {
   app: app,
   server: server,
   _: _,
-  portfolioCollection: portfolioCollection,
-  stockCollection: stockCollection
+  collection: {"portfolio": portfolioCollection,
+  			   "stock": stockCollection,
+  			   "setting": settingCollection}
 }

@@ -4,5 +4,7 @@
 
 ## Links
 Bm&fBovespahttp://www.bmfbovespa.com.br/home.aspx?idioma=pt-br
+
 Simulador Folha Invest: http://folhainvest.folha.uol.com.br/
+
 Tampermonkey: http://tampermonkey.net/
