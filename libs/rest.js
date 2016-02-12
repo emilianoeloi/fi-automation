@@ -20,7 +20,7 @@ var getTimeDescription = function(){
     return mm+'_'+dd+'_'+yyyy;
 } 
 function nextFriday() {
-    return "12/02/2016";
+    return "19/02/2016";
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();
@@ -165,4 +165,51 @@ modules.app.get(rootRote+stockRoute+'/:timeKey/:code', function(req, res) {
 	});
 
 	
+});
+
+/* SETTING */
+var settingRoute = "/setting";
+modules.app.get(rootRote+settingRoute, function(req, res) { 
+	modules.collection.setting.find({}, function(err, doc){
+		if(err){
+			res.json(500, err);
+		}else{
+			res.json(doc);
+		}
+	}); 
+});
+var sellStepRoute = "/sellStep";
+modules.app.post(rootRote+settingRoute+"/:timeKey/:code"+sellStepRoute, function(req, res) { 
+	var timeKey = req.params.timeKey;
+	var code = req.params.code;
+	var step = req.body.step;
+	
+	checkSetting({
+		"timeKey": timeKey,
+		"code": code,
+		"name": "SELL_STEP",
+		"step": step
+	}, function(){
+		res.json(302);
+	}, function(){
+		res.json(201); 
+	});
+});
+modules.app.get(rootRote+settingRoute+"/:timeKey/:code"+sellStepRoute+"/:step", function(req, res) { 
+	var timeKey = req.params.timeKey;
+	var code = req.params.code;
+	var step = req.params.step;
+
+	modules.collection.setting.find({
+		"timeKey": timeKey,
+		"code": code,
+		"name": "SELL_STEP",
+		"step": step
+	}, function(err, doc){
+		if(err){
+			res.json(404);
+		}else{
+			res.json(200, doc[0]);
+		}
+	});
 });

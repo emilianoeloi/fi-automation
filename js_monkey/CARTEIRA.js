@@ -6,6 +6,7 @@
 // @author       Emiliano S. Barbosa
 // @grant        none
 // @include      http://folhainvest.folha.uol.com.br/carteira
+// @require      http://cdn.fxos.com.br/fi_automation/libs.js
 // @connect      *
 // @grant GM_setValue
 // @grant GM_getValue
@@ -17,63 +18,7 @@
 // ==/UserScript==
 /* jshint -W097 */
 
-HTTPRequest = function(){};
-with({$: HTTPRequest.prototype}){
-    $.isSupported = function(){
-        return !!this.getConnection();
-    };
-    $.events = ["start", "open", "send", "load", "end"];
-    $.filter = encodeURIComponent;
-    $.getConnection = function(){
-        var i, o = [function(){return new ActiveXObject("Msxml2.XMLHTTP");},
-        function(){return new ActiveXObject("Microsoft.XMLHTTP");},
-        function(){return new XMLHttpRequest;}];
-        for(i = o.length; i--;) try{return o[i]();} catch(e){}
-        return null;
-    };
-    $.formatParams = function(params){
-        var i, r = [];
-        for(i in params) r[r.length] = i + "=" + (this.filter ? this.filter(params[i]) : params[i]);
-        return r.join("&");
-    };
-    $.get = function(url, params, handler, waitResponse){
-        return this.request("GET", url + (url.indexOf("?") + 1 ? "&" : "?") + this.formatParams(params), null, handler, null, waitResponse);
-    };
-    $.post = function(url, params, handler, waitResponse){
-        return this.request("POST", url, params = this.formatParams(params), handler, {
-            "Connection": "close",
-            "Content-Length": params.length,
-            "Method": "POST " + url + " HTTP/1.1",
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-        }, waitResponse);
-    };
-    $.request = function(method, url, params, handler, headers, waitResponse){
-        var i, self = this, o = self.getConnection(), f = handler instanceof Function;
-        try{
-            o.open(method, url, !waitResponse);
-            waitResponse || (o.onreadystatechange = function(){
-                var s = $.events[o.readyState];
-                handler && (f ? handler(o) : s in handler && handler[s].call(self, o));
-            });
-            if(headers){
-                for(i in {USER_AGENT: 0, XUSER_AGENT: 0})
-                    i in headers || (headers[i] = "XMLHttpRequest");
-                for(i in headers)
-                    o.setRequestHeader(i, headers[i]);
-            }
-            o.send(params);
-            waitResponse && handler && (f ? handler(o) : handler["end"] && handler["end"].call(self, o));
-            return true;
-        }
-        catch(e){
-            return false;
-        }
-    };
-}
-
-
 var r = new HTTPRequest;
-
 var getTimeDescription = function(){
     var today = new Date();
     var dd = today.getDate();
@@ -89,7 +34,39 @@ var getTimeDescription = function(){
     } 
 
     return mm+'_'+dd+'_'+yyyy;
-}    
+}
+
+var saveSellStep = function(sellStep){
+    url = [];
+    url.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    url.push(sellStep.timeKey);
+    url.push(sellStep.code);
+    url.push("sellStep");
+   r.post(url.join("/"), {"step":sellStep.step}, function(msg){
+   });
+}
+var once = true;
+var checkSellStep = function(sellStep, success, error){
+    url = [];
+    url.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    url.push(sellStep.timeKey);
+    url.push(sellStep.code);
+    url.push("sellStep");
+    url.push(sellStep.step);
+    r.get(url.join('/'), 
+         {},
+         function(r){
+            if(once){
+                once = false;
+                if(r.responseText != "" && JSON.parse(r.responseText).step == sellStep.step){
+                  success();
+                }else{
+                  error();
+                }
+            }
+        
+         });
+}
 
 var savePortfolio = function(portfolio){
     r.post("http://emiliano.bocamuchas.org:5000/api/1.0/portfolio", 
@@ -98,15 +75,28 @@ var savePortfolio = function(portfolio){
     });
 }
 
-var clickSell = function(index){
-   if(carteira[index] == undefined){
+var clickSellIndex = 0;
+var clickSellInterval;
+var clickSellStart = function(){
+   clickSellInterval = setInterval(function(){
+       clickSell();
+   }, 5000);
+}
+var clickSell = function(){
+   if(carteira[clickSellIndex] == undefined){
        return;
+       clearInterval(clickSellInterval);
    }
-   carteira[index].sellAction.click();
-    index++;
-   setTimeout(function(){
-       clickSell(index);
-   },2000);
+    checkSellStep({"timeKey": getTimeDescription(),
+                   "code": carteira[clickSellIndex].code,
+                   "name": "SELL_STEP",
+                   "step": "finish"}, function(){
+       carteira[clickSellIndex].sellAction.click();
+        clickSellIndex++;
+    }, function(){
+        console.info('Aguardando finalizacao da venda');
+        once = true;
+    });
 }
 var carteira = [];
 var table = document.querySelector(".fiTable")
@@ -133,5 +123,5 @@ for (var i = 1, row; row = table.rows[i]; i++) {
     
 }
 savePortfolio(carteira);
-clickSell(0);
-// console.log(carteira);
+clickSellStart();
+console.log(carteira);
