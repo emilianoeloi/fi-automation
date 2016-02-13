@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         CARTEIRA
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.1
+// @version      0.0.2
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
 // @include      http://folhainvest.folha.uol.com.br/carteira
+// @require      http://cdn.fxos.com.br/fi_automation/jquery.js
 // @require      http://cdn.fxos.com.br/fi_automation/libs.js
 // @connect      *
 // @grant GM_setValue
@@ -18,7 +19,6 @@
 // ==/UserScript==
 /* jshint -W097 */
 
-var r = new HTTPRequest;
 var getTimeDescription = function(){
     var today = new Date();
     var dd = today.getDate();
@@ -37,41 +37,45 @@ var getTimeDescription = function(){
 }
 
 var saveSellStep = function(sellStep){
-    url = [];
-    url.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
-    url.push(sellStep.timeKey);
-    url.push(sellStep.code);
-    url.push("sellStep");
-   r.post(url.join("/"), {"step":sellStep.step}, function(msg){
-   });
+    urlss = [];
+    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(sellStep.timeKey);
+    urlss.push(sellStep.code);
+    urlss.push("sellStep");
+    $.ajax({
+      method: "GET",
+      url: urlss.join('/'),
+      data: {}
+    });
 }
 var once = true;
 var checkSellStep = function(sellStep, success, error){
-    url = [];
-    url.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
-    url.push(sellStep.timeKey);
-    url.push(sellStep.code);
-    url.push("sellStep");
-    url.push(sellStep.step);
-    r.get(url.join('/'), 
-         {},
-         function(r){
-            if(once){
-                once = false;
-                if(r.responseText != "" && JSON.parse(r.responseText).step == sellStep.step){
-                  success();
-                }else{
-                  error();
-                }
-            }
-        
-         });
+    urlss = [];
+    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(sellStep.timeKey);
+    urlss.push(sellStep.code);
+    urlss.push("sellStep");
+    urlss.push(sellStep.step);
+    $.ajax({
+      method: "GET",
+      url: urlss.join('/'),
+      data: {}
+    }).done(function(r){
+      if(r.step == sellStep.step){
+        success()
+      }else{
+        error();
+      }
+    });
 }
 
 var savePortfolio = function(portfolio){
-    r.post("http://emiliano.bocamuchas.org:5000/api/1.0/portfolio", 
-           {"currentTime": getTimeDescription(), "portfolio": JSON.stringify(portfolio)}, function(msg){
-       console.log('savePortfolio',msg);
+  $.ajax({
+      method: "POST",
+      url: "http://emiliano.bocamuchas.org:5000/api/1.0/portfolio",
+      data: {"currentTime": getTimeDescription(), "portfolio": JSON.stringify(portfolio)}
+    }).done(function(msg){
+      console.info('savePortfolio',msg);
     });
 }
 
