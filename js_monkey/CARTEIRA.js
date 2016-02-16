@@ -19,6 +19,7 @@
 // ==/UserScript==
 /* jshint -W097 */
 
+
 var getTimeDescription = function(){
     var today = new Date();
     var dd = today.getDate();
@@ -43,12 +44,11 @@ var saveSellStep = function(sellStep){
     urlss.push(sellStep.code);
     urlss.push("sellStep");
     $.ajax({
-      method: "GET",
+      method: "POSt",
       url: urlss.join('/'),
-      data: {}
+      data: {"step":sellStep.step}
     });
 }
-var once = true;
 var checkSellStep = function(sellStep, success, error){
     urlss = [];
     urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
@@ -95,11 +95,16 @@ var clickSell = function(){
                    "code": carteira[clickSellIndex].code,
                    "name": "SELL_STEP",
                    "step": "finish"}, function(){
-       carteira[clickSellIndex].sellAction.click();
+        carteira[clickSellIndex].sellAction.click();
         clickSellIndex++;
+        saveSellStep({
+          "timeKey": getTimeDescription(),
+          "code": carteira[clickSellIndex].code,
+          "name": "SELL_STEP",
+          "step": "start"
+        });
     }, function(){
         console.info('Aguardando finalizacao da venda');
-        once = true;
     });
 }
 var carteira = [];

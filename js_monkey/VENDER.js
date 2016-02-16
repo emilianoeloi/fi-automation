@@ -19,21 +19,25 @@
 // ==/UserScript==
 /* jshint -W097 */
 
-var getTimeDescription = function(){
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-
-    if(dd<10) {
-        dd='0'+dd
-    } 
-
-    if(mm<10) {
-        mm='0'+mm
-    } 
-
-    return mm+'_'+dd+'_'+yyyy;
+/// Check sell is started
+var sellStartInterval;
+var sellStartAfterSuccess = function(){};
+var sellStartSuccess = function(data){
+  clearInterval(sellStartInterval);
+  sellStartAfterSuccess();
+}
+var sellStartWait = function(){
+  console.log('Sell Start Wait');
+}
+var sellStartStart = function(stockCode){
+   sellStartInterval = setInterval(function(){
+       checkSellStep({
+        "timeKey": getTimeDescription(),
+        "code": stockCode,
+        "name": "SELL_STEP",
+        "step": "start"
+       }, sellStartSuccess, sellStartWait);
+   }, 5000);
 }
 
 var fns = ['start_stop',
@@ -67,7 +71,10 @@ var checkSelectedCompany = function(){
         }, 5000);
     }else{
         console.log('start shell');
-        loadStock(f.company.value);
+        sellStartAfterSuccess = function(){
+            loadStock(f.company.value);    
+        }
+        sellStartStart(f.company.value);
     }
 }
 var loadStock = function(stockCode){
@@ -80,16 +87,23 @@ var loadStock = function(stockCode){
       url: urlss.join('/'),
       data: {}
     }).done(function(r){
-      sendSell(r.sellList, 0);
+        sendSellList = r.sellList;
     });
 }
-var sendSell = function(sellList, index){
-    next = index +1;
-    var sell = sellList[index];
+var sendSellList = [];
+var sendSellIndex = 0;
+var sendSellInterval;
+var sendSellStart = function(){
+   sendSellInterval = setInterval(function(){
+       sendSell();
+   }, 5000);
+}
+var sendSell = function(){
+    var sell = sendSellList[sendSellIndex];
     if (sell == undefined){
         return;
     }
-    console.info(index, next, sell);
+    console.info(sendSellIndex, next, sell);
 
     setTimeout(function(){
         f.value.value = sell.sellPrice;
@@ -97,8 +111,7 @@ var sendSell = function(sellList, index){
         f.pricing.checked = true;
         f.expiration_date.value = sell.expireDate;
         setTimeout(function(){
-            f.execute.click();
-            sendSell(sellList, next);   
+            f.execute.click();   
         }, 2000);
     },2000);
 }

@@ -206,10 +206,10 @@ modules.app.get(rootRote+settingRoute+"/:timeKey/:code"+sellStepRoute+"/:step", 
 		"name": "SELL_STEP",
 		"step": step
 	}, function(err, doc){
-		if(err){
-			res.json(404);
+		if(err || doc.length == 0){
+			res.status(404).send("Tente donovo mais tarde ;)");
 		}else{
-			res.json(200, doc[0]);
+			res.status(200).send(doc[0]);
 		}
 	});
 });
