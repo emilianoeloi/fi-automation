@@ -19,25 +19,80 @@
 // ==/UserScript==
 /* jshint -W097 */
 
-/// Check sell is started
-var sellStartInterval;
-var sellStartAfterSuccess = function(){};
-var sellStartSuccess = function(data){
-  clearInterval(sellStartInterval);
-  sellStartAfterSuccess();
+var getTimeDescription = function(){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if(dd<10) {
+        dd='0'+dd
+    } 
+
+    if(mm<10) {
+        mm='0'+mm
+    } 
+
+    return mm+'_'+dd+'_'+yyyy;
 }
-var sellStartWait = function(){
-  console.log('Sell Start Wait');
-}
-var sellStartStart = function(stockCode){
-   sellStartInterval = setInterval(function(){
-       checkSellStep({
-        "timeKey": getTimeDescription(),
-        "code": stockCode,
-        "name": "SELL_STEP",
-        "step": "start"
-       }, sellStartSuccess, sellStartWait);
+
+/// Step Waiting
+var StepWaiting = function(step, afterAction){
+    var that = this;
+   this.step = step;
+   this.afterAction = afterAction;
+   this.interval = setInterval(function(){
+       that.checkAPI();
    }, 5000);
+};
+StepWaiting.prototype.checkAPI = function(){
+    var that = this;
+    console.info('checkAPI');
+   
+    urlss = [];
+   urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+   urlss.push(this.step.timeKey);
+   urlss.push(this.step.code);
+   urlss.push("sellStep");
+   urlss.push(this.step.step);
+   
+    $.ajax({
+      method: "GET",
+      url: urlss.join('/'),
+      data: {}
+   }).done(function(r){
+        console.info(r);
+      if(r.step == that.step.step){
+        that.continue()
+      }else{
+        that.wait();
+      }
+    }).fail(function(jqXHR, textStatus, errorThrown){
+       console.info('fail',jqXHR, textStatus, errorThrown);
+        that.wait();
+    });
+}
+StepWaiting.prototype.wait = function(){
+   console.info('Step Waiting wait');
+}
+StepWaiting.prototype.continue = function(){
+    var that = this;
+   console.info('Step Waiting continue');
+   clearInterval(that.interval);
+   that.afterAction(); 
+}
+var saveStep = function(stepToSave){
+  console.info('saveStep - stepToSave', stepToSave);
+    urlss = [];
+    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(stepToSave.timeKey);
+    urlss.push(stepToSave.code);
+    urlss.push("sellStep");
+    $.ajax({
+      method: "POSt",
+      url: urlss.join('/'),
+      data: {"step":stepToSave.step}
+    });
 }
 
 var fns = ['start_stop',
@@ -53,7 +108,6 @@ var fns = ['start_stop',
 'execute.x',
 'execute.y',
 'execute'];
-var received = false;
 var f = {};
 var loadFields = function(){
     for(var index in fns){
@@ -71,10 +125,7 @@ var checkSelectedCompany = function(){
         }, 5000);
     }else{
         console.log('start shell');
-        sellStartAfterSuccess = function(){
-            loadStock(f.company.value);    
-        }
-        sellStartStart(f.company.value);
+        loadStock(f.company.value);    
     }
 }
 var loadStock = function(stockCode){
@@ -87,33 +138,65 @@ var loadStock = function(stockCode){
       url: urlss.join('/'),
       data: {}
     }).done(function(r){
-        sendSellList = r.sellList;
+console.log(r)
+      readyToSell = {};
+      readyToSell.timeKey = r.timeKey;
+      readyToSell.code = r.code;
+      readyToSell.name = "SELL_STEP";
+      readyToSell.step = "readyToSell";
+
+      sellList = r.sellList;
+        
+        startListeners(readyToSell);
+
+      saveStep(readyToSell);
     });
 }
-var sendSellList = [];
-var sendSellIndex = 0;
-var sendSellInterval;
-var sendSellStart = function(){
-   sendSellInterval = setInterval(function(){
-       sendSell();
-   }, 5000);
-}
-var sendSell = function(){
-    var sell = sendSellList[sendSellIndex];
-    if (sell == undefined){
-        return;
-    }
-    console.info(sendSellIndex, next, sell);
+var readyToSell;
+var s05;
+var s15;
+var sellList;
+var sendSell = function(sell, success){
+     setTimeout(function(){
+         f.value.value = sell.sellPrice;
+         f.quantity.value = sell.qtdValue;
+         f.pricing.checked = true;
+         f.expiration_date.value = sell.expireDate;
+         setTimeout(function(){
+             f.execute.click();
+             success();   
+         }, 2000);
+     },2000);
+ }
+ var startListeners = function(stock){
+  s05 = {};
+  s05.timeKey = stock.timeKey;
+  s05.code = stock.code;
+  s05.name = "SELL_STEP";
+  s05.step = "sell05"; 
 
-    setTimeout(function(){
-        f.value.value = sell.sellPrice;
-        f.quantity.value = sell.qtdValue;
-        f.pricing.checked = true;
-        f.expiration_date.value = sell.expireDate;
-        setTimeout(function(){
-            f.execute.click();   
-        }, 2000);
-    },2000);
-}
+  s15 = {};
+  s15.timeKey = stock.timeKey;
+  s15.code = stock.code;
+  s15.name = "SELL_STEP";
+  s15.step = "sell15"; 
+
+  /// Waiting ultil to ready to sell
+  new StepWaiting(readyToSell, function(){
+    sendSell(sellList[0], function(){
+      saveStep(s05);
+    });
+  });
+  new StepWaiting(s05, function(){
+    sendSell(sellList[1], function(){
+      saveStep(s15);
+    });
+  });
+  new StepWaiting(s15, function(){
+    sendSell(sellList[2], function(){
+      console.info('end');
+    });
+  });
+ }
 loadFields();
 checkSelectedCompany();

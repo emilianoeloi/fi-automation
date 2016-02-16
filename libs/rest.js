@@ -145,25 +145,16 @@ modules.app.get(rootRote+stockRoute+'/:timeKey/:code', function(req, res) {
 	var timeKey = req.params.timeKey;
 	var code = req.params.code;
 
-	checkSetting({
+	modules.collection.stock.find({
 		"timeKey": timeKey,
-		"code": code,
-		"name": "STOCK"
-	}, function(){
-		res.json(404);
-	}, function(){
-		modules.collection.stock.find({
-			"timeKey": timeKey,
-			"code": code
-		}, function(err, doc){
-			if(err){
-				res.json(500, err);
-			}else{
-				res.json(doc[0]);
-			}
-		}); 
-	});
-
+		"code": code
+	}, function(err, doc){
+		if(err){
+			res.status(500).send(err);
+		}else{
+			res.status(200).send(doc[0]);
+		}
+	}); 
 	
 });
 
