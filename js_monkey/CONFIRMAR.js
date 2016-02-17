@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         CONFIRMAR
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.1
+// @version      0.0.3
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
+// @require      http://cdn.fxos.com.br/fi_automation/libs.js
 // @include      http://folhainvest.folha.uol.com.br/confirmar
 // @connect      *
 // @grant GM_setValue
@@ -17,6 +18,20 @@
 // ==/UserScript==
 /* jshint -W097 */
 
+var cookieMng = {
+"set": function(a,b){
+document.cookie=a+"="+b;
+},"get": function(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}};
+
 var fns = ['confirm'];
 var received = false;
 var f = {};
@@ -26,8 +41,17 @@ var loadFields = function(){
 		f[fn] = document.getElementsByName(fn)[0];
 	}
     setTimeout(function(){
-        f.confirm.click();
-        window.close();
+    	var step = {
+    		"timeKey": cookieMng.get("timeKey"),
+    		"code": cookieMng.get("code"),
+    		"name": cookieMng.get("name"),
+    		"step": cookieMng.get("step")
+    	}
+    	console.info(step);
+        // f.confirm.click();
+        // setTimeout(function(){
+        //     window.close();
+        // }, 5000);
     }, 2000);
 }
 loadFields();

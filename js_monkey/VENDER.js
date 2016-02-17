@@ -4,20 +4,33 @@
 // @version      0.0.2
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_setClipboard
+// @grant        unsafeWindow
+// @grant        window.close
+// @grant        window.focus
 // @require      http://cdn.fxos.com.br/fi_automation/jquery.js
 // @require      http://cdn.fxos.com.br/fi_automation/libs.js
 // @include      http://folhainvest.folha.uol.com.br/vender*
 // @connect      *
-// @grant GM_setValue
-// @grant GM_getValue
-// @grant GM_setClipboard
-// @grant unsafeWindow
-// @grant window.close
-// @grant window.focus
 // @run-at document-end
 // ==/UserScript==
 /* jshint -W097 */
+
+var cookieMng = {
+"set": function(a,b){
+document.cookie=a+"="+b;
+},"get": function(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}};
 
 var getTimeDescription = function(){
     var today = new Date();
@@ -114,6 +127,7 @@ var loadFields = function(){
         var fn = fns[index];
         f[fn] = document.getElementsByName(fn)[0];
     }
+
     f.frm = document.getElementById("transaction");
     f.frm.setAttribute('target', '_blank');
 
@@ -155,8 +169,9 @@ console.log(r)
 var readyToSell;
 var s05;
 var s15;
+var s30;
 var sellList;
-var sendSell = function(sell, success){
+var sendSell = function(sell){
      setTimeout(function(){
          f.value.value = sell.sellPrice;
          f.quantity.value = sell.qtdValue;
@@ -164,7 +179,6 @@ var sendSell = function(sell, success){
          f.expiration_date.value = sell.expireDate;
          setTimeout(function(){
              f.execute.click();
-             success();   
          }, 2000);
      },2000);
  }
@@ -181,21 +195,31 @@ var sendSell = function(sell, success){
   s15.name = "SELL_STEP";
   s15.step = "sell15"; 
 
+  s30 = {};
+  s30.timeKey = stock.timeKey;
+  s30.code = stock.code;
+  s30.name = "SELL_STEP";
+  s30.step = "sell30";
+
+  var prepareAction = function(step){
+    cookieMng.set("timeKey":step.timeKey);
+    cookieMng.set("code": step.code);
+    cookieMng.set("name": step.name);
+    cookieMng.set("step": step.step);
+  }
+
   /// Waiting ultil to ready to sell
   new StepWaiting(readyToSell, function(){
-    sendSell(sellList[0], function(){
-      saveStep(s05);
-    });
+    prepareAction(s05);
+    sendSell(sellList[0]);
   });
   new StepWaiting(s05, function(){
-    sendSell(sellList[1], function(){
-      saveStep(s15);
-    });
+    prepareAction(s15);
+    sendSell(sellList[1]);
   });
   new StepWaiting(s15, function(){
-    sendSell(sellList[2], function(){
-      console.info('end');
-    });
+    prepareAction(s30);
+    sendSell(sellList[2]);
   });
  }
 loadFields();
