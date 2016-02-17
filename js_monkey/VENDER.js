@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VENDER
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.3
+// @version      0.0.4
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        GM_setValue
@@ -56,7 +56,7 @@ var StepWaiting = function(step, afterAction){
    this.afterAction = afterAction;
    this.interval = setInterval(function(){
        that.checkAPI();
-   }, 5000);
+   }, 2000);
 };
 StepWaiting.prototype.checkAPI = function(){
     var that = this;

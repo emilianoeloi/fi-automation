@@ -19,6 +19,19 @@
 // ==/UserScript==
 /* jshint -W097 */
 
+var cookieMng = {
+"set": function(a,b){
+document.cookie=a+"="+b;
+},"get": function(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}};
 
 var getTimeDescription = function(){
     var today = new Date();
@@ -37,35 +50,62 @@ var getTimeDescription = function(){
     return mm+'_'+dd+'_'+yyyy;
 }
 
-var saveSellStep = function(sellStep){
+/// Step Waiting
+var StepWaiting = function(step, afterAction){
+    var that = this;
+   this.step = step;
+   this.afterAction = afterAction;
+   this.interval = setInterval(function(){
+       that.checkAPI();
+   }, 2000);
+};
+StepWaiting.prototype.checkAPI = function(){
+    var that = this;
+    console.info('checkAPI');
+   
     urlss = [];
-    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
-    urlss.push(sellStep.timeKey);
-    urlss.push(sellStep.code);
-    urlss.push("sellStep");
-    $.ajax({
-      method: "POSt",
-      url: urlss.join('/'),
-      data: {"step":sellStep.step}
-    });
-}
-var checkSellStep = function(sellStep, success, error){
-    urlss = [];
-    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
-    urlss.push(sellStep.timeKey);
-    urlss.push(sellStep.code);
-    urlss.push("sellStep");
-    urlss.push(sellStep.step);
+   urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+   urlss.push(this.step.timeKey);
+   urlss.push(this.step.code);
+   urlss.push("sellStep");
+   urlss.push(this.step.step);
+   
     $.ajax({
       method: "GET",
       url: urlss.join('/'),
       data: {}
-    }).done(function(r){
-      if(r.step == sellStep.step){
-        success()
+   }).done(function(r){
+        console.info(r);
+      if(r.step == that.step.step){
+        that.continue()
       }else{
-        error();
+        that.wait();
       }
+    }).fail(function(jqXHR, textStatus, errorThrown){
+       console.info('fail',jqXHR, textStatus, errorThrown);
+        that.wait();
+    });
+}
+StepWaiting.prototype.wait = function(){
+   console.info('Step Waiting wait');
+}
+StepWaiting.prototype.continue = function(){
+    var that = this;
+   console.info('Step Waiting continue');
+   clearInterval(that.interval);
+   that.afterAction(); 
+}
+var saveStep = function(stepToSave){
+  console.info('saveStep - stepToSave', stepToSave);
+    urlss = [];
+    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(stepToSave.timeKey);
+    urlss.push(stepToSave.code);
+    urlss.push("sellStep");
+    $.ajax({
+      method: "POSt",
+      url: urlss.join('/'),
+      data: {"step":stepToSave.step}
     });
 }
 
@@ -78,34 +118,28 @@ var savePortfolio = function(portfolio){
       console.info('savePortfolio',msg);
     });
 }
-
 var clickSellIndex = 0;
-var clickSellInterval;
-var clickSellStart = function(){
-   clickSellInterval = setInterval(function(){
-       clickSell();
-   }, 5000);
-}
-var clickSell = function(){
-   if(carteira[clickSellIndex] == undefined){
-       return;
-       clearInterval(clickSellInterval);
-   }
-    checkSellStep({"timeKey": getTimeDescription(),
-                   "code": carteira[clickSellIndex].code,
-                   "name": "SELL_STEP",
-                   "step": "finish"}, function(){
-        carteira[clickSellIndex].sellAction.click();
-        clickSellIndex++;
-        saveSellStep({
-          "timeKey": getTimeDescription(),
-          "code": carteira[clickSellIndex].code,
-          "name": "SELL_STEP",
-          "step": "start"
-        });
-    }, function(){
-        console.info('Aguardando finalizacao da venda');
-    });
+var sFinish = {};
+var startSell = function(){
+
+  if(carteira[clickSellIndex] == undefined){
+    return;
+  }
+  stock = carteira[clickSellIndex];
+
+  sFinish.timeKey = getTimeDescription();
+  sFinish.code = stock.code;
+  sFinish.name = "SELL_STEP";
+  sFinish.step = "finish";
+
+  /// Waiting ultil to ready to sell
+  new StepWaiting(sFinish, function(){
+    clickSellIndex++;
+    startSell();
+  });
+
+  stock.sellAction.click();
+   
 }
 var carteira = [];
 var table = document.querySelector(".fiTable")
@@ -132,5 +166,5 @@ for (var i = 1, row; row = table.rows[i]; i++) {
     
 }
 savePortfolio(carteira);
-clickSellStart();
-console.log(carteira);
+
+startSell();
