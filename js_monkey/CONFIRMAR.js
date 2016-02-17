@@ -5,6 +5,7 @@
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
+// @require      http://cdn.fxos.com.br/fi_automation/jquery.js
 // @require      http://cdn.fxos.com.br/fi_automation/libs.js
 // @include      http://folhainvest.folha.uol.com.br/confirmar
 // @connect      *
@@ -32,6 +33,24 @@ document.cookie=a+"="+b;
     return "";
 }};
 
+var saveStep = function(stepToSave, success){
+  console.info('saveStep - stepToSave', stepToSave);
+    urlss = [];
+    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(stepToSave.timeKey);
+    urlss.push(stepToSave.code);
+    urlss.push("sellStep");
+    $.ajax({
+      method: "POST",
+      url: urlss.join('/'),
+      data: {"step":stepToSave.step}
+    }).done(function(){
+    	success();
+    }).fail(function(){
+    	success();
+    });
+}
+
 var fns = ['confirm'];
 var received = false;
 var f = {};
@@ -40,18 +59,15 @@ var loadFields = function(){
 		var fn = fns[index];
 		f[fn] = document.getElementsByName(fn)[0];
 	}
-    setTimeout(function(){
-    	var step = {
-    		"timeKey": cookieMng.get("timeKey"),
-    		"code": cookieMng.get("code"),
-    		"name": cookieMng.get("name"),
-    		"step": cookieMng.get("step")
-    	}
-    	console.info(step);
-        // f.confirm.click();
-        // setTimeout(function(){
-        //     window.close();
-        // }, 5000);
-    }, 2000);
+	var step = {
+		"timeKey": cookieMng.get("timeKey"),
+		"code": cookieMng.get("code"),
+		"name": cookieMng.get("name"),
+		"step": cookieMng.get("step")
+	}
+    
+    saveStep(step, function(){
+        f.confirm.click();
+    });
 }
 loadFields();

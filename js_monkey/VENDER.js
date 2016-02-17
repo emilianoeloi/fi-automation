@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VENDER
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.2
+// @version      0.0.3
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        GM_setValue
@@ -182,6 +182,14 @@ var sendSell = function(sell){
          }, 2000);
      },2000);
  }
+
+  var prepareAction = function(step){
+    cookieMng.set("timeKey", step.timeKey);
+    cookieMng.set("code", step.code);
+    cookieMng.set("name", step.name);
+    cookieMng.set("step", step.step);
+  }
+
  var startListeners = function(stock){
   s05 = {};
   s05.timeKey = stock.timeKey;
@@ -201,13 +209,6 @@ var sendSell = function(sell){
   s30.name = "SELL_STEP";
   s30.step = "sell30";
 
-  var prepareAction = function(step){
-    cookieMng.set("timeKey":step.timeKey);
-    cookieMng.set("code": step.code);
-    cookieMng.set("name": step.name);
-    cookieMng.set("step": step.step);
-  }
-
   /// Waiting ultil to ready to sell
   new StepWaiting(readyToSell, function(){
     prepareAction(s05);
@@ -220,6 +221,9 @@ var sendSell = function(sell){
   new StepWaiting(s15, function(){
     prepareAction(s30);
     sendSell(sellList[2]);
+  });
+  new StepWaiting(s30, function(){
+    window.close();
   });
  }
 loadFields();
