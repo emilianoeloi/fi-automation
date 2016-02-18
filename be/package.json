@@ -1,0 +1,12 @@
+{
+  "name": "fi_backend",
+  "version": "1.0.0",
+  "description": "Folha Invest - Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "deploy": ""
+  },
+  "author": "Emiliano Barbosa",
+  "license": "MIT"
+}
