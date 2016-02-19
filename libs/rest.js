@@ -20,7 +20,7 @@ var getTimeDescription = function(){
     return mm+'_'+dd+'_'+yyyy;
 } 
 function nextFriday() {
-    return "19/02/2016";
+    return "26/02/2016";
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();
@@ -58,11 +58,17 @@ var prepareStockToSave = function(stock){
 	prepareStockSellValues(stock);
 	return stock;
 }
-var createSell = function(stock, gainPercent,  qtdPercent){
-	var sell = {}
+var createSell = function(key, stock, gainPercent,  qtdPercent){
+	var sell = {key:key};
 	sell.qtdPercent = (qtdPercent * 100) + '%';
+
+	if(stock.rate/100 > gainPercent){
+		gainPercent = stock.rate/100;
+	}
+
 	sell.gainPercent = (gainPercent * 100) + '%';
 	sell.qtdValue = parseInt(stock.qtd * qtdPercent);
+
 	sell.gainValue = stock.medium * gainPercent;
 	sell.sellPrice = Number((stock.medium + sell.gainValue).toFixed(2));
 	sell.expireDate = nextFriday();
@@ -70,9 +76,9 @@ var createSell = function(stock, gainPercent,  qtdPercent){
 }
 var prepareStockSellValues = function(stock){
 	stock.sellList =[];
-	stock.sellList.push(createSell(stock, 0.05,0.25));
-	stock.sellList.push(createSell(stock, 0.15,0.25));
-	stock.sellList.push(createSell(stock, 0.30,0.5));
+	stock.sellList.push(createSell(0,stock, 0.05,0.25));
+	stock.sellList.push(createSell(1,stock, 0.15,0.25));
+	stock.sellList.push(createSell(2,stock, 0.30,0.5));
 }
 var preparePortfolioToSave = function(portfolio){
 	for(var index in portfolio.stocks){

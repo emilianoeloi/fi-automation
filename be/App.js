@@ -75,9 +75,57 @@ class StockRow extends React.Component {
 					<td>medium: {this.props.data.medium}</td>
 					<td>{this.props.data.rate}%</td>
 				</tr>
+				<tr>
+					<td colSpan="4">
+						<SellTable sellList={this.props.data.sellList} />
+					</td>
+				</tr> 
 		   	</tbody>	
 	}
+}
 
+class SellTable extends React.Component {
+	
+	render(){
+		console.info(this.props.sellList);
+		var total = 0;
+		let sellRows = this.props.sellList.map( (sell, i) => {
+			total += sell.qtdValue * sell.sellPrice
+			return <SellRow data={sell} key={sell.key} index={i} />
+		});
+		return (
+			<table>
+				<tbody>
+					{sellRows}
+					<tr>
+						<td colSpan="7">
+						</td>
+						<td>{total}</td>
+					</tr>
+				</tbody>
+			</table>
+		)
+	}
+}
+
+class SellRow extends React.Component {
+	render(){
+		let sellRow = this.props.data; 
+		let odd = (this.props.index % 2) ? "pure-table-odd": "";
+		let subtotal = sellRow.qtdValue * sellRow.sellPrice; 
+		return (
+			<tr className={odd}>
+				<td>{sellRow.expireDate}</td>
+				<td>{sellRow.gainPercent}</td>
+				<td>{sellRow.gainValue}</td>
+				<td>{sellRow.qtdPercent}</td>
+				<td>{sellRow.qtdValue}</td>
+				<td>{sellRow.sellPrice}</td>
+				<td>{sellRow.sellPrice}</td>
+				<td>{subtotal}</td>
+			</tr>
+		)
+	}
 }
 
 export default App
