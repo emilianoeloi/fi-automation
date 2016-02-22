@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CARTEIRA
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.2
+// @version      0.0.5
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -141,7 +141,13 @@ var startSell = function(){
   stock.sellAction.click();
    
 }
+
 var carteira = [];
+
+var amountTable = document.getElementsByClassName("fiTable")[1];
+var cap = amountTable.rows[1].cells[0].innerHTML;
+carteira.capital = cap.replace('.','').replace(',','.');
+
 var table = document.querySelector(".fiTable")
 for (var i = 1, row; row = table.rows[i]; i++) {
     var papel = {};
@@ -158,6 +164,9 @@ for (var i = 1, row; row = table.rows[i]; i++) {
     papel.total = row.cells[7].innerHTML;
     papel.variation = row.cells[8].innerHTML;
     papel.rate = row.cells[9].innerHTML;
+
+    console.log(carteira.capital, table.rows.length);
+    papel.capitalToBuy = carteira.capital / (table.rows.length - 2);
     
     papel.buyAction.setAttribute('target','_blank');
     papel.sellAction.setAttribute('target','_blank');
@@ -167,4 +176,4 @@ for (var i = 1, row; row = table.rows[i]; i++) {
 }
 savePortfolio(carteira);
 
-startSell();
+/// startSell();

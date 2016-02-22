@@ -40,6 +40,9 @@ class StockTable extends React.Component {
 		})
 		return (
 			<table className="pure-table">
+				<caption>
+					Portfolio
+				</caption>
 			    <thead>
 			        <tr>
 			            <th>Stock</th>
@@ -72,7 +75,8 @@ class StockRow extends React.Component {
 					<td>{this.props.data.name}</td>
 					<td>
 						current: {this.props.data.total}<br />
-						medium: {totalMedium.toFixed(2)}
+						medium: {totalMedium.toFixed(2)}<br />
+						capita: {this.props.data.portfolioCapital}
 					</td>
 					<td>medium: {this.props.data.medium}</td>
 					<td>{this.props.data.rate}%</td>

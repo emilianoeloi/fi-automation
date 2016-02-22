@@ -55,7 +55,10 @@ var prepareStockToSave = function(stock){
 	stock.total = Number(stock.total.replace('.','').replace(',','.'));
 	stock.variation = Number(stock.variation.replace('.','').replace(',','.'));
 	stock.rate = Number(stock.rate.replace(',','.'));
+
 	prepareStockSellValues(stock);
+	prepareStockBuyValues(stock);
+
 	return stock;
 }
 var createSell = function(key, stock, gainPercent,  qtdPercent){
@@ -74,11 +77,23 @@ var createSell = function(key, stock, gainPercent,  qtdPercent){
 	sell.expireDate = nextFriday();
 	return sell;
 }
+var createBuy = function(key, stock, gainPercent,  qtdPercent){
+	var buy = {key:key};
+	
+
+	return buy;
+}
 var prepareStockSellValues = function(stock){
 	stock.sellList =[];
-	stock.sellList.push(createSell(0,stock, 0.10,0.25));
-	stock.sellList.push(createSell(1,stock, 0.20,0.25));
-	stock.sellList.push(createSell(2,stock, 0.30,0.5));
+	stock.sellList.push(createSell(0, stock, 0.10, 0.25));
+	stock.sellList.push(createSell(1, stock, 0.20, 0.25));
+	stock.sellList.push(createSell(2, stock, 0.30, 0.5));
+}
+var prepareStockBuyValues = function(stock){
+	stock.buyList = [];
+	stock.buyList.push(createBuy(0, stock, 0.02, 0.25));
+	stock.buyList.push(createBuy(1, stock, 0.04, 0.25));
+	stock.buyList.push(createBuy(2, stock, 0.06, 0.50));
 }
 var preparePortfolioToSave = function(portfolio){
 	for(var index in portfolio.stocks){
