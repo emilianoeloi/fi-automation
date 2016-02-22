@@ -10,7 +10,7 @@ Para a venda a regra é a seguinte.
 
 - Uma ordem semanal que vende outros 25% das ações com 20% de ganho.
 	
-- Uma última ordem que vende os 50% restante das ações com 30% de ganho.
+- Uma última ordem que vende os 50% das ações com 30% de ganho.
 
 ## Automatização do Processo de compra de ações
 
