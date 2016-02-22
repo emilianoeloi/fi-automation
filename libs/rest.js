@@ -62,22 +62,22 @@ var createSell = function(key, stock, gainPercent,  qtdPercent){
 	var sell = {key:key};
 	sell.qtdPercent = (qtdPercent * 100) + '%';
 
-	if(stock.rate/100 > gainPercent){
-		gainPercent = stock.rate/100;
-	}
-
-	sell.gainPercent = (gainPercent * 100) + '%';
+	sell.gainPercent = (gainPercent * 100).toFixed(2) + '%';
 	sell.qtdValue = parseInt(stock.qtd * qtdPercent);
 
 	sell.gainValue = stock.medium * gainPercent;
-	sell.sellPrice = Number((stock.medium + sell.gainValue).toFixed(2));
+	sell.sellPrice = stock.medium + sell.gainValue;
+
+	sell.gainValue = sell.gainValue.toFixed(2);
+	sell.sellPrice = sell.sellPrice.toFixed(2);
+
 	sell.expireDate = nextFriday();
 	return sell;
 }
 var prepareStockSellValues = function(stock){
 	stock.sellList =[];
-	stock.sellList.push(createSell(0,stock, 0.05,0.25));
-	stock.sellList.push(createSell(1,stock, 0.15,0.25));
+	stock.sellList.push(createSell(0,stock, 0.10,0.25));
+	stock.sellList.push(createSell(1,stock, 0.20,0.25));
 	stock.sellList.push(createSell(2,stock, 0.30,0.5));
 }
 var preparePortfolioToSave = function(portfolio){

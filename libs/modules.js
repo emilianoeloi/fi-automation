@@ -5,14 +5,14 @@ var http = require('http'),
     mongo = require('mongodb'),
     monk = require('monk'),
     db = monk('localhost:27017/firefoxos');
-var collectionPrefix = "dev033";
+var collectionPrefix = "dev041";
 var portfolioCollection = db.get(collectionPrefix+'portfolio');
 var stockCollection = db.get(collectionPrefix+'stock');
 var settingCollection = db.get(collectionPrefix+'setting');
 
 var enableCORS = function (req, res, next) {
     
-    res.header('Access-Control-Allow-Origin', 'http://folhainvest.folha.uol.com.br');
+  res.header('Access-Control-Allow-Origin', 'http://folhainvest.folha.uol.com.br');
 	res.header('Access-Control-Allow-Headers', '*');
 	res.header('Access-Control-Allow-Methods', 'OPTIONS,POST,GET');
 	res.header('Access-Control-Expose-Headers', 'X-Api-Version, X-Request-Id, X-Response-Time');

@@ -60,18 +60,20 @@ class StockTable extends React.Component {
 class StockRow extends React.Component {
 
 	render(){
-		console.log(this.props.index);
-		let odd = (this.props.index % 2) ? "pure-table-odd": "";
+		let totalMedium = this.props.data.medium * this.props.data.qtd;
 		return 	<tbody>
-				<tr className={odd}>
+				<tr className="pure-table-odd">
 					<td>{this.props.data.code}</td>
 					<td>qtd: {this.props.data.qtd}</td>
 					<td>current: {this.props.data.current}</td>
 					<td>{this.props.data.variation}</td>
 				</tr>
-				<tr className={odd}>
+				<tr className="pure-table-odd">
 					<td>{this.props.data.name}</td>
-					<td>total: {this.props.data.total}</td>
+					<td>
+						current: {this.props.data.total}<br />
+						medium: {totalMedium.toFixed(2)}
+					</td>
 					<td>medium: {this.props.data.medium}</td>
 					<td>{this.props.data.rate}%</td>
 				</tr>
@@ -95,12 +97,24 @@ class SellTable extends React.Component {
 		});
 		return (
 			<table>
+				<caption>
+					Vendas
+				</caption>
+				<thead>
+					<th> Expiration </th>
+					<th> Gain Percent </th>
+					<th> Gain Value </th>
+					<th> Qtd Percent </th>
+					<th> Qtd Value </th>
+					<th> Preço de venda </th>
+					<th> Total </th>
+				</thead>
 				<tbody>
 					{sellRows}
 					<tr>
-						<td colSpan="7">
+						<td colSpan="6">
 						</td>
-						<td>{total}</td>
+						<th>{total.toFixed(2)}</th>
 					</tr>
 				</tbody>
 			</table>
@@ -121,8 +135,7 @@ class SellRow extends React.Component {
 				<td>{sellRow.qtdPercent}</td>
 				<td>{sellRow.qtdValue}</td>
 				<td>{sellRow.sellPrice}</td>
-				<td>{sellRow.sellPrice}</td>
-				<td>{subtotal}</td>
+				<td>{subtotal.toFixed(2)}</td>
 			</tr>
 		)
 	}
