@@ -86,6 +86,11 @@ class StockRow extends React.Component {
 						<SellTable sellList={this.props.data.sellList} />
 					</td>
 				</tr> 
+				<tr>
+					<td colSpan="4">
+						<BuyTable buyList={this.props.data.buyList} />
+					</td>
+				</tr>
 		   	</tbody>	
 	}
 }
@@ -139,6 +144,63 @@ class SellRow extends React.Component {
 				<td>{sellRow.qtdPercent}</td>
 				<td>{sellRow.qtdValue}</td>
 				<td>{sellRow.sellPrice}</td>
+				<td>{subtotal.toFixed(2)}</td>
+			</tr>
+		)
+	}
+}
+
+class BuyTable extends React.Component {
+	
+	render(){
+		console.info(this.props.buyList);
+		var total = 0;
+		let buyRows = this.props.buyList.map( (buy, i) => {
+			total += buy.qtdValue;
+			return <BuyRow data={buy} key={buy.key} index={i} />
+		});
+		return (
+			<table>
+				<caption>
+					Compras
+				</caption>
+				<thead>
+					<th> Expiration </th>
+					<th> Qtd Percent </th>
+					<th> Qtd Value </th>
+					<th> Lost Percent </th>
+					<th> Lost Value </th>
+					<th> Qtd Buy </th>
+					<th> Buy Price </th>
+					<th> Total </th>
+				</thead>
+				<tbody>
+					{buyRows}
+					<tr>
+						<td colSpan="6">
+						</td>
+						<th>{total.toFixed(2)}</th>
+					</tr>
+				</tbody>
+			</table>
+		)
+	}
+}
+
+class BuyRow extends React.Component {
+	render(){
+		let buyRow = this.props.data; 
+		let odd = (this.props.index % 2) ? "pure-table-odd": "";
+		let subtotal = buyRow.qtdValue;
+		return (
+			<tr className={odd}>
+				<td>{buyRow.expireDate}</td>
+				<td>{buyRow.qtdPercent}</td>
+				<td>{buyRow.qtdValue.toFixed(2)}</td>
+				<td>{buyRow.lostPercent}</td>
+				<td>{buyRow.lostValue.toFixed(2)}</td>
+				<td>{buyRow.qtdBuy.toFixed(0)}</td>
+				<td>{buyRow.buyPrice.toFixed(2)}</td>
 				<td>{subtotal.toFixed(2)}</td>
 			</tr>
 		)

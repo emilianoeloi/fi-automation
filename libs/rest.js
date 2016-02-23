@@ -95,6 +95,7 @@ var createBuy = function(key, stock, lostPercent,  qtdPercent){
 	buy.qtdValue = stock.capitalToBuy * qtdPercent;
 	buy.lostValue = stock.medium * lostPercent;
 	buy.qtdBuy = buy.qtdValue / buy.lostValue;
+	buy.buyPrice = stock.medium - buy.lostValue;
 
 	buy.qtdPercent = (qtdPercent * 100) + '%';
 	buy.lostPercent = (lostPercent * 100) + '%';
