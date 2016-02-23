@@ -76,7 +76,7 @@ class StockRow extends React.Component {
 					<td>
 						current: {this.props.data.total}<br />
 						medium: {totalMedium.toFixed(2)}<br />
-						capita: {this.props.data.portfolioCapital}
+						capita: {this.props.data.capitalToBuy.toFixed(2)}
 					</td>
 					<td>medium: {this.props.data.medium}</td>
 					<td>{this.props.data.rate}%</td>
