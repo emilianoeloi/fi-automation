@@ -177,7 +177,7 @@ class BuyTable extends React.Component {
 				<tbody>
 					{buyRows}
 					<tr>
-						<td colSpan="6">
+						<td colSpan="7">
 						</td>
 						<th>{total.toFixed(2)}</th>
 					</tr>
