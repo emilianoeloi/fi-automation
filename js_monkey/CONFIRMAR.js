@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CONFIRMAR
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.4
+// @version      0.0.5
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -39,15 +39,16 @@ var saveStep = function(stepToSave, success){
     urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
     urlss.push(stepToSave.timeKey);
     urlss.push(stepToSave.code);
-    urlss.push("sellStep");
+    urlss.push(stepToSave.name);
+    console.info('saveStep', stepToSave, urlss.join('/'));
     $.ajax({
       method: "POST",
       url: urlss.join('/'),
       data: {"step":stepToSave.step}
     }).done(function(){
-    	success();
+        success();
     }).fail(function(){
-    	success();
+        success();
     });
 }
 
@@ -55,16 +56,16 @@ var fns = ['confirm'];
 var received = false;
 var f = {};
 var loadFields = function(){
-	for(var index in fns){
-		var fn = fns[index];
-		f[fn] = document.getElementsByName(fn)[0];
-	}
-	var step = {
-		"timeKey": cookieMng.get("timeKey"),
-		"code": cookieMng.get("code"),
-		"name": cookieMng.get("name"),
-		"step": cookieMng.get("step")
-	}
+    for(var index in fns){
+        var fn = fns[index];
+        f[fn] = document.getElementsByName(fn)[0];
+    }
+    var step = {
+        "timeKey": cookieMng.get("timeKey"),
+        "code": cookieMng.get("code"),
+        "name": cookieMng.get("name"),
+        "step": cookieMng.get("step")
+    }
     
     saveStep(step, function(){
         f.confirm.click();
