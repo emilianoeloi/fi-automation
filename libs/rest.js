@@ -81,7 +81,7 @@ var createSell = function(key, stock, gainPercent,  qtdPercent){
 	return sell;
 }
 /*
- amount     | qtdPercent |   qtdValue | lostPercent | lostValue  |   qtdBuy | 
+ amount     | qtdPercent |   qtdValue | lostPercent | buyValue  |   qtdBuy | 
  ===========|============|============|=============|============|==========|
  R$3.109,00 |        25% | R$  777,25 |          2% |   R$ 18.17 |      42  |
  R$3.109,00 |        25% | R$  777,25 |          4% |   R$ 17,80 |      43  |
@@ -94,8 +94,9 @@ var createBuy = function(key, stock, lostPercent,  qtdPercent){
 
 	buy.qtdValue = stock.capitalToBuy * qtdPercent;
 	buy.lostValue = stock.medium * lostPercent;
-	buy.qtdBuy = buy.qtdValue / buy.lostValue;
-	buy.buyPrice = stock.medium - buy.lostValue;
+	buy.buyPrice = (stock.medium - buy.lostValue).toFixed(2);
+	buy.qtdBuy = (buy.qtdValue / buy.buyPrice).toFixed(0);
+	
 
 	buy.qtdPercent = (qtdPercent * 100) + '%';
 	buy.lostPercent = (lostPercent * 100) + '%';
@@ -213,16 +214,16 @@ modules.app.get(rootRote+settingRoute, function(req, res) {
 		}
 	}); 
 });
-var sellStepRoute = "/sellStep";
-modules.app.post(rootRote+settingRoute+"/:timeKey/:code"+sellStepRoute, function(req, res) { 
+modules.app.post(rootRote+settingRoute+"/:timeKey/:code/:stepName", function(req, res) { 
 	var timeKey = req.params.timeKey;
 	var code = req.params.code;
+	var stepName = req.params.stepName;
 	var step = req.body.step;
 	
 	checkSetting({
 		"timeKey": timeKey,
 		"code": code,
-		"name": "SELL_STEP",
+		"name": stepName,
 		"step": step
 	}, function(){
 		res.json(302);
@@ -230,15 +231,16 @@ modules.app.post(rootRote+settingRoute+"/:timeKey/:code"+sellStepRoute, function
 		res.json(201); 
 	});
 });
-modules.app.get(rootRote+settingRoute+"/:timeKey/:code"+sellStepRoute+"/:step", function(req, res) { 
+modules.app.get(rootRote+settingRoute+"/:timeKey/:code/:stepName/:step", function(req, res) { 
 	var timeKey = req.params.timeKey;
 	var code = req.params.code;
 	var step = req.params.step;
+	var stepName = req.params.stepName;
 
 	modules.collection.setting.find({
 		"timeKey": timeKey,
 		"code": code,
-		"name": "SELL_STEP",
+		"name": stepName,
 		"step": step
 	}, function(err, doc){
 		if(err || doc.length == 0){
