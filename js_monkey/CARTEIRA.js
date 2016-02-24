@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CARTEIRA
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.6
+// @version      0.0.7
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -18,6 +18,18 @@
 // @run-at document-end
 // ==/UserScript==
 /* jshint -W097 */
+
+var ENV = "DEV";
+
+var ENV_LIST = {};
+ENV_LIST["PROD"] = {
+  "urlAPI":"http://emiliano.bocamuchas.org:5000/api/1.0"
+};
+ENV_LIST["DEV"] = {
+  "urlAPI":"http://localhost:5000/api/1.0"
+};
+
+var urlAPI = ENV_LIST[ENV].urlAPI;
 
 var cookieMng = {
 "set": function(a,b){
@@ -61,16 +73,16 @@ var StepWaiting = function(step, afterAction){
 };
 StepWaiting.prototype.checkAPI = function(){
     var that = this;
-    console.info('checkAPI');
+    
+  urlss = [];
+  urlss.push(urlAPI);
+  urlss.push("setting");
+  urlss.push(this.step.timeKey);
+  urlss.push(this.step.code);
+  urlss.push(this.step.name);
+  urlss.push(this.step.step);
    
-    urlss = [];
-   urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
-   urlss.push(this.step.timeKey);
-   urlss.push(this.step.code);
-   urlss.push(this.step.name);
-   urlss.push(this.step.step);
-   
-    $.ajax({
+  $.ajax({
       method: "GET",
       url: urlss.join('/'),
       data: {}
@@ -98,7 +110,8 @@ StepWaiting.prototype.continue = function(){
 var saveStep = function(stepToSave){
   console.info('saveStep - stepToSave', stepToSave);
     urlss = [];
-    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(urlAPI);
+    urlss.push("setting");
     urlss.push(stepToSave.timeKey);
     urlss.push(stepToSave.code);
     urlss.push("sellStep");
@@ -112,7 +125,7 @@ var saveStep = function(stepToSave){
 var savePortfolio = function(portfolio){
   $.ajax({
       method: "POST",
-      url: "http://emiliano.bocamuchas.org:5000/api/1.0/portfolio",
+      url: urlAPI+"/portfolio",
       data: {"currentTime": getTimeDescription(), "portfolio": JSON.stringify(portfolio)}
     }).done(function(msg){
       console.info('savePortfolio',msg);
@@ -201,4 +214,4 @@ for (var i = 1, row; row = table.rows[i]; i++) {
 savePortfolio(carteira);
 
 /// startSell();
-startBuy();
+/// startBuy();

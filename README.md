@@ -2,6 +2,24 @@
 
 ## startup
 
+`npm install`
+
+`make server-run`
+
+`make backend-run`
+
+## Portfolio (Carteira)
+
+Lista de status: 
+
+	- started - Primeiro status, significa que o portfolio foi cadastrado e nenhuma ordem de venda ou compra foi realizada.
+
+ 	- selling - Nesse estado o processo de venda está sendo realizado, ou seja, ordens de venda estão sendo cadastradas.
+
+ 	- shopping - Nesse ordens de compras estão sendo cadastradas.
+
+ 	- waiting - Nesse, em teoria todas as ordens já foram cadastradas.
+
 ## Automatização do Processo de venda de ações
 
 Para a venda a regra é a seguinte.

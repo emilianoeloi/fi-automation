@@ -7,9 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "Push",
-    "Notification",
-    "iOS"
+    "Folha Invest",
+    "Automation"
   ],
   "author": "Emiliano Eloi",
   "license": "MIT",

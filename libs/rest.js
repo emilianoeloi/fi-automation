@@ -134,6 +134,14 @@ var saveStock = function(stock){
 			{upsert:true}
 		);
 }
+
+var savePortfolio = function(portfolio){
+	modules.collection.portfolio.update(
+		{"timeKey":portfolio.timeKey},
+		portfolio,
+		{upsert:true}
+	);
+}
 	
 /* PORTFOLIO */
 var portfolioRoute = "/portfolio";
@@ -168,11 +176,32 @@ modules.app.get(rootRote+portfolioRoute, function(req, res) {
 		}
 	}); 
 });
-modules.app.get(rootRote+portfolioRoute+"/:", function(req, res) { 
-	res.json(); 
+modules.app.get(rootRote+portfolioRoute+"/:timeKey", function(req, res) { 
+	var timeKey = req.params.timeKey;
+	modules.collection.portfolio.find({"timeKey":timeKey}, function(err, doc){
+		if(err){
+			res.status(500).send(err);
+		}else{
+			res.status(200).send(doc);
+		}
+	}); 
 });
-modules.app.put(rootRote+portfolioRoute, function(req, res) { 
-	res.json(); 
+modules.app.put(rootRote+portfolioRoute+"/:timeKey", function(req, res) { 
+	var timeKey = req.params.timeKey;
+	var status = req.body.status;
+	modules.collection.portfolio.find({"timeKey":timeKey}, function(err, doc){
+		if(err){
+			res.status(500).send(err);
+		}else{
+			if (doc.length == 0){
+				res.status(404).send("Tente novamente mais tarde ;)");
+			}
+			var portfolio = doc[0];
+			portfolio.status = status;
+			savePortfolio(portfolio);
+			res.status(200).send();
+		}
+	})
 });
 
 /* STOCK */
