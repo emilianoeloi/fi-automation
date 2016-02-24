@@ -123,7 +123,7 @@ class SellTable extends React.Component {
 					<tr>
 						<td colSpan="6">
 						</td>
-						<th>{total.toFixed(2)}</th>
+						<td>{total.toFixed(2)}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -179,7 +179,7 @@ class BuyTable extends React.Component {
 					<tr>
 						<td colSpan="7">
 						</td>
-						<th>{total.toFixed(2)}</th>
+						<td>{total.toFixed(2)}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -199,8 +199,8 @@ class BuyRow extends React.Component {
 				<td>{buyRow.qtdValue.toFixed(2)}</td>
 				<td>{buyRow.lostPercent}</td>
 				<td>{buyRow.lostValue.toFixed(2)}</td>
-				<td>{buyRow.qtdBuy.toFixed(0)}</td>
-				<td>{buyRow.buyPrice.toFixed(2)}</td>
+				<td>{buyRow.qtdBuy}</td>
+				<td>{buyRow.buyPrice}</td>
 				<td>{subtotal.toFixed(2)}</td>
 			</tr>
 		)

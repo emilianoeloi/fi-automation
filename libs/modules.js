@@ -5,7 +5,7 @@ var http = require('http'),
     mongo = require('mongodb'),
     monk = require('monk'),
     db = monk('localhost:27017/firefoxos');
-var collectionPrefix = "dev059";
+var collectionPrefix = "dev064";
 var portfolioCollection = db.get(collectionPrefix+'portfolio');
 var stockCollection = db.get(collectionPrefix+'stock');
 var settingCollection = db.get(collectionPrefix+'setting');
@@ -42,6 +42,6 @@ module.exports = {
   server: server,
   _: _,
   collection: {"portfolio": portfolioCollection,
-  			   "stock": stockCollection,
-  			   "setting": settingCollection}
+  			       "stock": stockCollection,
+  			       "setting": settingCollection}
 }
