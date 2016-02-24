@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CARTEIRA
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.7
+// @version      0.0.8
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -99,11 +99,11 @@ StepWaiting.prototype.checkAPI = function(){
     });
 }
 StepWaiting.prototype.wait = function(){
-   console.info('Step Waiting wait');
+   console.info('Step Waiting [wait]');
 }
 StepWaiting.prototype.continue = function(){
     var that = this;
-   console.info('Step Waiting continue');
+   console.info('Step Waiting [continue]');
    clearInterval(that.interval);
    that.afterAction(); 
 }
@@ -114,7 +114,7 @@ var saveStep = function(stepToSave){
     urlss.push("setting");
     urlss.push(stepToSave.timeKey);
     urlss.push(stepToSave.code);
-    urlss.push("sellStep");
+    urlss.push(stepToSave.name);
     $.ajax({
       method: "POSt",
       url: urlss.join('/'),
@@ -215,3 +215,7 @@ savePortfolio(carteira);
 
 /// startSell();
 /// startBuy();
+
+window.onbeforeunload = function() {
+  return "FI Automation in action!";
+}
