@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VENDER
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.4
+// @version      0.0.5
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        GM_setValue
@@ -94,7 +94,7 @@ StepWaiting.prototype.continue = function(){
    clearInterval(that.interval);
    that.afterAction(); 
 }
-var saveStep = function(stepToSave){
+var saveStep = function(stepToSave, success){
   console.info('saveStep - stepToSave', stepToSave);
     urlss = [];
     urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
@@ -105,6 +105,10 @@ var saveStep = function(stepToSave){
       method: "POSt",
       url: urlss.join('/'),
       data: {"step":stepToSave.step}
+    }).always(function(){
+        if(typeof success == 'function'){
+           success();
+        }
     });
 }
 
@@ -208,6 +212,12 @@ var sendSell = function(sell){
   s30.code = stock.code;
   s30.name = "SELL_STEP";
   s30.step = "sell30";
+     
+     sF = {};
+  sF.timeKey = stock.timeKey;
+  sF.code = stock.code;
+  sF.name = "SELL_STEP";
+  sF.step = "finish";
 
   /// Waiting ultil to ready to sell
   new StepWaiting(readyToSell, function(){
@@ -223,7 +233,9 @@ var sendSell = function(sell){
     sendSell(sellList[2]);
   });
   new StepWaiting(s30, function(){
-    window.close();
+      saveStep(sF, function(){
+         window.close();
+      });
   });
  }
 loadFields();

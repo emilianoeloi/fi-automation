@@ -67,7 +67,7 @@ StepWaiting.prototype.checkAPI = function(){
    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
    urlss.push(this.step.timeKey);
    urlss.push(this.step.code);
-   urlss.push("sellStep");
+   urlss.push(this.step.name);
    urlss.push(this.step.step);
    
     $.ajax({
