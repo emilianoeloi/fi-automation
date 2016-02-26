@@ -23,7 +23,7 @@ function nextFriday() {
     return "26/02/2016";
 }
 function tomorrow(){
-	return '24/02/2016';
+	return '26/02/2016';
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();

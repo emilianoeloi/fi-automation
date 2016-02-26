@@ -1,12 +1,16 @@
 module.exports = {
 	entry: './main.js',
 	output: {
-		path: './',
+		path: './dist/',
 		filename: 'index.js'
 	},
 	devServer: {
+		contentBase: './',
 		inline: true,
 		port: 3333
+	},
+	resolve: {
+		extensions: ['', '.js', 'jsx']
 	},
 	module:{
 		loaders: [

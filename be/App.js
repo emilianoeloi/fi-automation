@@ -14,7 +14,7 @@ class App extends React.Component {
 	componentDidMount(){
 		console.info('componentDidMount');
 		$.ajax({
-			url:"http://emiliano.bocamuchas.org:5000/api/1.0/stock",
+			url:"http://localhost:5000/api/1.0/stock",
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
@@ -52,13 +52,13 @@ class StockTable extends React.Component {
 			        </tr>
 			    </thead>
 
-			    
+
 			        {rows}
-			    
+
 			</table>
 		)
 	}
-}	
+}
 
 class StockRow extends React.Component {
 
@@ -85,18 +85,18 @@ class StockRow extends React.Component {
 					<td colSpan="4">
 						<SellTable sellList={this.props.data.sellList} />
 					</td>
-				</tr> 
+				</tr>
 				<tr>
 					<td colSpan="4">
 						<BuyTable buyList={this.props.data.buyList} />
 					</td>
 				</tr>
-		   	</tbody>	
+		   	</tbody>
 	}
 }
 
 class SellTable extends React.Component {
-	
+
 	render(){
 		console.info(this.props.sellList);
 		var total = 0;
@@ -133,9 +133,9 @@ class SellTable extends React.Component {
 
 class SellRow extends React.Component {
 	render(){
-		let sellRow = this.props.data; 
+		let sellRow = this.props.data;
 		let odd = (this.props.index % 2) ? "pure-table-odd": "";
-		let subtotal = sellRow.qtdValue * sellRow.sellPrice; 
+		let subtotal = sellRow.qtdValue * sellRow.sellPrice;
 		return (
 			<tr className={odd}>
 				<td>{sellRow.expireDate}</td>
@@ -151,7 +151,7 @@ class SellRow extends React.Component {
 }
 
 class BuyTable extends React.Component {
-	
+
 	render(){
 		console.info(this.props.buyList);
 		var total = 0;
@@ -189,7 +189,7 @@ class BuyTable extends React.Component {
 
 class BuyRow extends React.Component {
 	render(){
-		let buyRow = this.props.data; 
+		let buyRow = this.props.data;
 		let odd = (this.props.index % 2) ? "pure-table-odd": "";
 		let subtotal = buyRow.qtdValue;
 		return (

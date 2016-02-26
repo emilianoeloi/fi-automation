@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CONFIRMAR
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.5
+// @version      0.0.9
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -18,6 +18,18 @@
 // @run-at document-end
 // ==/UserScript==
 /* jshint -W097 */
+
+var ENV = "DEV";
+
+var ENV_LIST = {};
+ENV_LIST["PROD"] = {
+  "urlAPI":"http://emiliano.bocamuchas.org:5000/api/1.0"
+};
+ENV_LIST["DEV"] = {
+  "urlAPI":"http://localhost:5000/api/1.0"
+};
+
+var urlAPI = ENV_LIST[ENV].urlAPI;
 
 var cookieMng = {
 "set": function(a,b){
@@ -36,7 +48,8 @@ document.cookie=a+"="+b;
 var saveStep = function(stepToSave, success){
   console.info('saveStep - stepToSave', stepToSave);
     urlss = [];
-    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(urlAPI);
+    urlss.push("setting");
     urlss.push(stepToSave.timeKey);
     urlss.push(stepToSave.code);
     urlss.push(stepToSave.name);

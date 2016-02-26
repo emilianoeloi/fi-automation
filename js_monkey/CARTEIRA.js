@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CARTEIRA
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.8
+// @version      0.0.9
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -214,7 +214,7 @@ for (var i = 1, row; row = table.rows[i]; i++) {
 savePortfolio(carteira);
 
 /// startSell();
-/// startBuy();
+startBuy();
 
 window.onbeforeunload = function() {
   return "FI Automation in action!";

@@ -10,7 +10,7 @@
     "Folha Invest",
     "Automation"
   ],
-  "author": "Emiliano Eloi",
+  "author": "Emiliano Eloi S. Barbosa",
   "license": "MIT",
   "dependencies": {
     "body-parser": "1.12.0",

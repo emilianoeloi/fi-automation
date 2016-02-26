@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         COMPRAR
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.2
+// @version      0.0.9
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        GM_setValue
@@ -17,6 +17,18 @@
 // @run-at document-end
 // ==/UserScript==
 /* jshint -W097 */
+
+var ENV = "DEV";
+
+var ENV_LIST = {};
+ENV_LIST["PROD"] = {
+  "urlAPI":"http://emiliano.bocamuchas.org:5000/api/1.0"
+};
+ENV_LIST["DEV"] = {
+  "urlAPI":"http://localhost:5000/api/1.0"
+};
+
+var urlAPI = ENV_LIST[ENV].urlAPI;
 
 var cookieMng = {
 "set": function(a,b){
@@ -63,7 +75,8 @@ StepWaiting.prototype.checkAPI = function(){
     // console.info('checkAPI', this.step);
    
     urlss = [];
-   urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(urlAPI);
+   urlss.push("setting");
    urlss.push(this.step.timeKey);
    urlss.push(this.step.code);
    urlss.push("buyStep");
@@ -97,7 +110,8 @@ StepWaiting.prototype.continue = function(){
 var saveStep = function(stepToSave, success){
   // console.info('saveStep - stepToSave', stepToSave);
     urlss = [];
-    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(urlAPI);
+    urlss.push("setting");
     urlss.push(stepToSave.timeKey);
     urlss.push(stepToSave.code);
     urlss.push("buyStep");
@@ -148,7 +162,8 @@ var checkSelectedCompany = function(){
 }
 var loadStock = function(stockCode){
     var urlss = [];
-    urlss.push('http://emiliano.bocamuchas.org:5000/api/1.0/stock');
+    urlss.push(urlAPI);
+    urlss.push('stock');
     urlss.push(getTimeDescription());
     urlss.push(stockCode);
     $.ajax({

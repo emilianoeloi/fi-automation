@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ORDERS
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.5
+// @version      0.0.9
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
