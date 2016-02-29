@@ -11,19 +11,19 @@ var getTimeDescription = function(){
 
     if(dd<10) {
         dd='0'+dd
-    } 
+    }
 
     if(mm<10) {
         mm='0'+mm
-    } 
+    }
 
     return mm+'_'+dd+'_'+yyyy;
-} 
+}
 function nextFriday() {
-    return "26/02/2016";
+  return "04/03/2016";
 }
 function tomorrow(){
-	return '26/02/2016';
+	return '29/02/2016';
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();
@@ -81,13 +81,13 @@ var createSell = function(key, stock, gainPercent,  qtdPercent){
 	return sell;
 }
 /*
- amount     | qtdPercent |   qtdValue | lostPercent | buyValue  |   qtdBuy | 
+ amount     | qtdPercent |   qtdValue | lostPercent | buyValue  |   qtdBuy |
  ===========|============|============|=============|============|==========|
  R$3.109,00 |        25% | R$  777,25 |          2% |   R$ 18.17 |      42  |
  R$3.109,00 |        25% | R$  777,25 |          4% |   R$ 17,80 |      43  |
  R$3.109,00 |        50% | R$1.554,50 |          6% |   R$ 17,43 |      89  |
  ===========|============|============|=============|============|==========|
-            |       100% | R$3.109,00 |              
+            |       100% | R$3.109,00 |
 */
 var createBuy = function(key, stock, lostPercent,  qtdPercent){
 	var buy = {key:key};
@@ -96,7 +96,7 @@ var createBuy = function(key, stock, lostPercent,  qtdPercent){
 	buy.lostValue = stock.medium * lostPercent;
 	buy.buyPrice = (stock.medium - buy.lostValue).toFixed(2);
 	buy.qtdBuy = (buy.qtdValue / buy.buyPrice).toFixed(0);
-	
+
 
 	buy.qtdPercent = (qtdPercent * 100) + '%';
 	buy.lostPercent = (lostPercent * 100) + '%';
@@ -142,10 +142,10 @@ var savePortfolio = function(portfolio){
 		{upsert:true}
 	);
 }
-	
+
 /* PORTFOLIO */
 var portfolioRoute = "/portfolio";
-modules.app.post(rootRote+portfolioRoute, function(req, res) { 
+modules.app.post(rootRote+portfolioRoute, function(req, res) {
 	var portfolio = JSON.parse(req.body.portfolio);
 	var pToSave = {
 		"timeKey": req.body.currentTime,
@@ -164,19 +164,19 @@ modules.app.post(rootRote+portfolioRoute, function(req, res) {
 		}else{
 			res.json(201, doc);
 		}
-	}); 
+	});
 	});
 });
-modules.app.get(rootRote+portfolioRoute, function(req, res) { 
+modules.app.get(rootRote+portfolioRoute, function(req, res) {
 	modules.collection.portfolio.find({}, function(err, doc){
 		if(err){
 			res.json(500, err);
 		}else{
 			res.json(doc);
 		}
-	}); 
+	});
 });
-modules.app.get(rootRote+portfolioRoute+"/:timeKey", function(req, res) { 
+modules.app.get(rootRote+portfolioRoute+"/:timeKey", function(req, res) {
 	var timeKey = req.params.timeKey;
 	modules.collection.portfolio.find({"timeKey":timeKey}, function(err, doc){
 		if(err){
@@ -184,9 +184,9 @@ modules.app.get(rootRote+portfolioRoute+"/:timeKey", function(req, res) {
 		}else{
 			res.status(200).send(doc);
 		}
-	}); 
+	});
 });
-modules.app.put(rootRote+portfolioRoute+"/:timeKey", function(req, res) { 
+modules.app.put(rootRote+portfolioRoute+"/:timeKey", function(req, res) {
 	var timeKey = req.params.timeKey;
 	var status = req.body.status;
 	modules.collection.portfolio.find({"timeKey":timeKey}, function(err, doc){
@@ -206,14 +206,14 @@ modules.app.put(rootRote+portfolioRoute+"/:timeKey", function(req, res) {
 
 /* STOCK */
 var stockRoute = "/stock";
-modules.app.get(rootRote+stockRoute, function(req, res) { 
+modules.app.get(rootRote+stockRoute, function(req, res) {
 	modules.collection.stock.find({}, function(err, doc){
 		if(err){
 			res.json(500, err);
 		}else{
 			res.json(doc);
 		}
-	}); 
+	});
 });
 modules.app.get(rootRote+stockRoute+'/:timeKey/:code', function(req, res) {
 	var timeKey = req.params.timeKey;
@@ -228,27 +228,27 @@ modules.app.get(rootRote+stockRoute+'/:timeKey/:code', function(req, res) {
 		}else{
 			res.status(200).send(doc[0]);
 		}
-	}); 
-	
+	});
+
 });
 
 /* SETTING */
 var settingRoute = "/setting";
-modules.app.get(rootRote+settingRoute, function(req, res) { 
+modules.app.get(rootRote+settingRoute, function(req, res) {
 	modules.collection.setting.find({}, function(err, doc){
 		if(err){
 			res.json(500, err);
 		}else{
 			res.json(doc);
 		}
-	}); 
+	});
 });
-modules.app.post(rootRote+settingRoute+"/:timeKey/:code/:stepName", function(req, res) { 
+modules.app.post(rootRote+settingRoute+"/:timeKey/:code/:stepName", function(req, res) {
 	var timeKey = req.params.timeKey;
 	var code = req.params.code;
 	var stepName = req.params.stepName;
 	var step = req.body.step;
-	
+
 	checkSetting({
 		"timeKey": timeKey,
 		"code": code,
@@ -257,10 +257,10 @@ modules.app.post(rootRote+settingRoute+"/:timeKey/:code/:stepName", function(req
 	}, function(){
 		res.json(302);
 	}, function(){
-		res.json(201); 
+		res.json(201);
 	});
 });
-modules.app.get(rootRote+settingRoute+"/:timeKey/:code/:stepName/:step", function(req, res) { 
+modules.app.get(rootRote+settingRoute+"/:timeKey/:code/:stepName/:step", function(req, res) {
 	var timeKey = req.params.timeKey;
 	var code = req.params.code;
 	var step = req.params.step;

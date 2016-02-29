@@ -3,4 +3,6 @@ deploy:
 server-run:
 	@node server.js
 backend-run:
-	@cd be; npm start	
+	@cd be; npm start
+db-start:
+	@mongod	

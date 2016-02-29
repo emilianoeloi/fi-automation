@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VENDER
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.5
+// @version      0.1.0
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        GM_setValue
@@ -17,6 +17,19 @@
 // @run-at document-end
 // ==/UserScript==
 /* jshint -W097 */
+
+var ENV = "DEV";
+
+var ENV_LIST = {};
+ENV_LIST["PROD"] = {
+  "urlAPI":"http://emiliano.bocamuchas.org:5000/api/1.0"
+};
+ENV_LIST["DEV"] = {
+  "urlAPI":"http://localhost:5000/api/1.0"
+};
+
+var urlAPI = ENV_LIST[ENV].urlAPI;
+
 
 var cookieMng = {
 "set": function(a,b){
@@ -40,11 +53,11 @@ var getTimeDescription = function(){
 
     if(dd<10) {
         dd='0'+dd
-    } 
+    }
 
     if(mm<10) {
         mm='0'+mm
-    } 
+    }
 
     return mm+'_'+dd+'_'+yyyy;
 }
@@ -61,14 +74,15 @@ var StepWaiting = function(step, afterAction){
 StepWaiting.prototype.checkAPI = function(){
     var that = this;
     console.info('checkAPI');
-   
+
     urlss = [];
-   urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(urlAPI);
+   urlss.push("setting");
    urlss.push(this.step.timeKey);
    urlss.push(this.step.code);
    urlss.push("sellStep");
    urlss.push(this.step.step);
-   
+
     $.ajax({
       method: "GET",
       url: urlss.join('/'),
@@ -92,12 +106,13 @@ StepWaiting.prototype.continue = function(){
     var that = this;
    console.info('Step Waiting continue');
    clearInterval(that.interval);
-   that.afterAction(); 
+   that.afterAction();
 }
 var saveStep = function(stepToSave, success){
   console.info('saveStep - stepToSave', stepToSave);
     urlss = [];
-    urlss.push("http://emiliano.bocamuchas.org:5000/api/1.0/setting");
+    urlss.push(urlAPI);
+    urlss.push("setting");
     urlss.push(stepToSave.timeKey);
     urlss.push(stepToSave.code);
     urlss.push("sellStep");
@@ -143,12 +158,13 @@ var checkSelectedCompany = function(){
         }, 5000);
     }else{
         console.log('start shell');
-        loadStock(f.company.value);    
+        loadStock(f.company.value);
     }
 }
 var loadStock = function(stockCode){
     var urlss = [];
-    urlss.push('http://emiliano.bocamuchas.org:5000/api/1.0/stock');
+    urlss.push(urlAPI);
+    urlss.push("stock");
     urlss.push(getTimeDescription());
     urlss.push(stockCode);
     $.ajax({
@@ -164,7 +180,7 @@ console.log(r)
       readyToSell.step = "readyToSell";
 
       sellList = r.sellList;
-        
+
         startListeners(readyToSell);
 
       saveStep(readyToSell);
@@ -199,20 +215,20 @@ var sendSell = function(sell){
   s05.timeKey = stock.timeKey;
   s05.code = stock.code;
   s05.name = "SELL_STEP";
-  s05.step = "sell05"; 
+  s05.step = "sell05";
 
   s15 = {};
   s15.timeKey = stock.timeKey;
   s15.code = stock.code;
   s15.name = "SELL_STEP";
-  s15.step = "sell15"; 
+  s15.step = "sell15";
 
   s30 = {};
   s30.timeKey = stock.timeKey;
   s30.code = stock.code;
   s30.name = "SELL_STEP";
   s30.step = "sell30";
-     
+
      sF = {};
   sF.timeKey = stock.timeKey;
   sF.code = stock.code;

@@ -4,12 +4,12 @@ import TestUtils from 'react-addons-test-utils';
 
 import expect from 'expect';
 
-import {SampleComponent} from '../src/sample-component.js';
+import {SampleComponent} from '../App.js';
 
 
-describe('Sample Component', () => {
+describe('App Component', () => {
   beforeEach(function() {
-    this.component = TestUtils.renderIntoDocument(<SampleComponent />);
+    this.component = TestUtils.renderIntoDocument(<App />);
   });
 
   afterEach(function() {

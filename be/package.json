@@ -4,7 +4,8 @@
   "description": "Folha Invest - Backend",
   "main": "server.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "make run",
+    "test": "make test",
     "deploy": ""
   },
   "author": "Emiliano Barbosa",
