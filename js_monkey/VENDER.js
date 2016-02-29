@@ -176,7 +176,7 @@ console.log(r)
       readyToSell = {};
       readyToSell.timeKey = r.timeKey;
       readyToSell.code = r.code;
-      readyToSell.name = "SELL_STEP";
+      readyToSell.name = "sellStep";
       readyToSell.step = "readyToSell";
 
       sellList = r.sellList;
@@ -214,25 +214,25 @@ var sendSell = function(sell){
   s05 = {};
   s05.timeKey = stock.timeKey;
   s05.code = stock.code;
-  s05.name = "SELL_STEP";
+  s05.name = "sellStep";
   s05.step = "sell05";
 
   s15 = {};
   s15.timeKey = stock.timeKey;
   s15.code = stock.code;
-  s15.name = "SELL_STEP";
+  s15.name = "sellStep";
   s15.step = "sell15";
 
   s30 = {};
   s30.timeKey = stock.timeKey;
   s30.code = stock.code;
-  s30.name = "SELL_STEP";
+  s30.name = "sellStep";
   s30.step = "sell30";
 
      sF = {};
   sF.timeKey = stock.timeKey;
   sF.code = stock.code;
-  sF.name = "SELL_STEP";
+  sF.name = "sellStep";
   sF.step = "finish";
 
   /// Waiting ultil to ready to sell
