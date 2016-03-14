@@ -59,9 +59,9 @@ var saveStep = function(stepToSave, success){
       url: urlss.join('/'),
       data: {"step":stepToSave.step}
     }).done(function(){
-        success();
+    	success();
     }).fail(function(){
-        success();
+    	success();
     });
 }
 
@@ -69,17 +69,17 @@ var fns = ['confirm'];
 var received = false;
 var f = {};
 var loadFields = function(){
-    for(var index in fns){
-        var fn = fns[index];
-        f[fn] = document.getElementsByName(fn)[0];
-    }
-    var step = {
-        "timeKey": cookieMng.get("timeKey"),
-        "code": cookieMng.get("code"),
-        "name": cookieMng.get("name"),
-        "step": cookieMng.get("step")
-    }
-    
+	for(var index in fns){
+		var fn = fns[index];
+		f[fn] = document.getElementsByName(fn)[0];
+	}
+	var step = {
+		"timeKey": cookieMng.get("timeKey"),
+		"code": cookieMng.get("code"),
+		"name": cookieMng.get("name"),
+		"step": cookieMng.get("step")
+	}
+
     saveStep(step, function(){
         f.confirm.click();
     });

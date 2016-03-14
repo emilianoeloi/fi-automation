@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         COMPRAR
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.9
+// @version      0.1.0
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        GM_setValue
@@ -52,11 +52,11 @@ var getTimeDescription = function(){
 
     if(dd<10) {
         dd='0'+dd
-    } 
+    }
 
     if(mm<10) {
         mm='0'+mm
-    } 
+    }
 
     return mm+'_'+dd+'_'+yyyy;
 }
@@ -73,7 +73,7 @@ var StepWaiting = function(step, afterAction){
 StepWaiting.prototype.checkAPI = function(){
     var that = this;
     // console.info('checkAPI', this.step);
-   
+
     urlss = [];
     urlss.push(urlAPI);
    urlss.push("setting");
@@ -81,7 +81,7 @@ StepWaiting.prototype.checkAPI = function(){
    urlss.push(this.step.code);
    urlss.push("buyStep");
    urlss.push(this.step.step);
-   
+
     $.ajax({
       method: "GET",
       url: urlss.join('/'),
@@ -105,7 +105,7 @@ StepWaiting.prototype.continue = function(){
     var that = this;
    // console.info('Step Waiting continue');
    clearInterval(that.interval);
-   that.afterAction(); 
+   that.afterAction();
 }
 var saveStep = function(stepToSave, success){
   // console.info('saveStep - stepToSave', stepToSave);
@@ -154,10 +154,10 @@ var checkSelectedCompany = function(){
     if(f.company.value == ""){
         setTimeout(function(){
             checkSelectedCompany();
-        }, 5000);
+        }, 2000);
     }else{
         // console.log('start shell');
-        loadStock(f.company.value);    
+        loadStock(f.company.value);
     }
 }
 var loadStock = function(stockCode){
@@ -179,7 +179,7 @@ var loadStock = function(stockCode){
       readyToBuy.step = "readyToBuy";
 
       buyList = r.buyList;
-        
+
         startListeners(readyToBuy);
 
       saveStep(readyToBuy);
@@ -217,20 +217,20 @@ var sendBuy = function(buy){
   b02.timeKey = stock.timeKey;
   b02.code = stock.code;
   b02.name = globalStepName;
-  b02.step = "buy02"; 
+  b02.step = "buy02";
 
   b04 = {};
   b04.timeKey = stock.timeKey;
   b04.code = stock.code;
   b04.name = globalStepName;
-  b04.step = "buy04"; 
+  b04.step = "buy04";
 
   b06 = {};
   b06.timeKey = stock.timeKey;
   b06.code = stock.code;
   b06.name = globalStepName;
   b06.step = "sell06";
-     
+
      sF = {};
   sF.timeKey = stock.timeKey;
   sF.code = stock.code;

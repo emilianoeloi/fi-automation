@@ -20,10 +20,10 @@ var getTimeDescription = function(){
     return mm+'_'+dd+'_'+yyyy;
 }
 function nextFriday() {
-  return "04/03/2016";
+  return "18/03/2016";
 }
 function tomorrow(){
-	return '29/02/2016';
+	return '14/03/2016';
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();
@@ -81,7 +81,7 @@ var createSell = function(key, stock, gainPercent,  qtdPercent){
 	return sell;
 }
 /*
- amount     | qtdPercent |   qtdValue | lostPercent | buyValue  |   qtdBuy |
+ amount     | qtdPercent |   qtdValue | lostPercent | buyValue   |   qtdBuy |
  ===========|============|============|=============|============|==========|
  R$3.109,00 |        25% | R$  777,25 |          2% |   R$ 18.17 |      42  |
  R$3.109,00 |        25% | R$  777,25 |          4% |   R$ 17,80 |      43  |
@@ -94,9 +94,12 @@ var createBuy = function(key, stock, lostPercent,  qtdPercent){
 
 	buy.qtdValue = stock.capitalToBuy * qtdPercent;
 	buy.lostValue = stock.medium * lostPercent;
-	buy.buyPrice = (stock.medium - buy.lostValue).toFixed(2);
+	buy.buyPrice = (stock.medium - buy.lostValue);
+	if (buy.buyPrice > stock.current){
+		buy.buyPrice = stock.current;
+	}
+	buy.buyPrice = buy.buyPrice.toFixed(2);
 	buy.qtdBuy = (buy.qtdValue / buy.buyPrice).toFixed(0);
-
 
 	buy.qtdPercent = (qtdPercent * 100) + '%';
 	buy.lostPercent = (lostPercent * 100) + '%';

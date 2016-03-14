@@ -155,7 +155,7 @@ var checkSelectedCompany = function(){
     if(f.company.value == ""){
         setTimeout(function(){
             checkSelectedCompany();
-        }, 5000);
+        }, 2000);
     }else{
         console.log('start shell');
         loadStock(f.company.value);

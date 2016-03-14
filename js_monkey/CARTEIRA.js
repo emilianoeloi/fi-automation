@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CARTEIRA
 // @namespace    http://folhainvest.folha.uol.com.br
-// @version      0.0.9
+// @version      0.1.0
 // @description  try to take over the world!
 // @author       Emiliano S. Barbosa
 // @grant        none
@@ -53,11 +53,11 @@ var getTimeDescription = function(){
 
     if(dd<10) {
         dd='0'+dd
-    } 
+    }
 
     if(mm<10) {
         mm='0'+mm
-    } 
+    }
 
     return mm+'_'+dd+'_'+yyyy;
 }
@@ -73,7 +73,7 @@ var StepWaiting = function(step, afterAction){
 };
 StepWaiting.prototype.checkAPI = function(){
     var that = this;
-    
+
   urlss = [];
   urlss.push(urlAPI);
   urlss.push("setting");
@@ -81,7 +81,7 @@ StepWaiting.prototype.checkAPI = function(){
   urlss.push(this.step.code);
   urlss.push(this.step.name);
   urlss.push(this.step.step);
-   
+
   $.ajax({
       method: "GET",
       url: urlss.join('/'),
@@ -105,7 +105,7 @@ StepWaiting.prototype.continue = function(){
     var that = this;
    console.info('Step Waiting [continue]');
    clearInterval(that.interval);
-   that.afterAction(); 
+   that.afterAction();
 }
 var saveStep = function(stepToSave){
   console.info('saveStep - stepToSave', stepToSave);
@@ -142,7 +142,7 @@ var startSell = function(){
 
   sFinish.timeKey = getTimeDescription();
   sFinish.code = stock.code;
-  sFinish.name = "SELL_STEP";
+  sFinish.name = "sellStep";
   sFinish.step = "finish";
 
   /// Waiting ultil to ready to sell
@@ -152,7 +152,7 @@ var startSell = function(){
   });
 
   stock.sellAction.click();
-   
+
 }
 
 var clickBuyIndex = 0;
@@ -176,7 +176,7 @@ var startBuy = function(){
   });
 
   stock.buyAction.click();
-   
+
 }
 
 var carteira = [];
@@ -188,7 +188,7 @@ carteira.capital = cap.replace('.','').replace(',','.');
 var table = document.querySelector(".fiTable")
 for (var i = 1, row; row = table.rows[i]; i++) {
     var papel = {};
-    papel.code = row.cells[0].childNodes[0].innerHTML; 
+    papel.code = row.cells[0].childNodes[0].innerHTML;
     if(papel.code == "Total"){
         break;
     }
@@ -204,12 +204,12 @@ for (var i = 1, row; row = table.rows[i]; i++) {
 
     console.log(carteira.capital, table.rows.length);
     papel.capitalToBuy = carteira.capital / (table.rows.length - 2);
-    
+
     papel.buyAction.setAttribute('target','_blank');
     papel.sellAction.setAttribute('target','_blank');
-    
+
     carteira.push(papel);
-    
+
 }
 savePortfolio(carteira);
 
@@ -217,5 +217,6 @@ savePortfolio(carteira);
 startBuy();
 
 window.onbeforeunload = function() {
-  return "FI Automation in action!";
+    console.log("FI Automation in action!");
+  return false;
 }
