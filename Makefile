@@ -1,8 +1,11 @@
+help:
+	@echo "Available Targets:"
+	@cat Makefile | egrep '^(\w+?):' | sed 's/:\(.*\)//g' | sed 's/^/- /g'
 deploy:
 	@rsync -arvuz . root@emiliano.bocamuchas.org:/var/nodejs/fi_automation
-server-run:
+server_run:
 	@node server.js
-backend-run:
+backend_run:
 	@cd be; npm start
-db-start:
+db_start:
 	@mongod	

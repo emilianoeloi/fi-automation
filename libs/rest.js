@@ -23,7 +23,7 @@ function nextFriday() {
   return "18/03/2016";
 }
 function tomorrow(){
-	return '14/03/2016';
+	return '18/03/2016';
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();
@@ -110,6 +110,19 @@ var createBuy = function(key, stock, lostPercent,  qtdPercent){
 
 	return buy;
 }
+var createMinimalQtdBuy = function(key,stock,qtd){
+  var buy = {key:key};
+
+  buy.qtdValue = 0;
+  buy.qtdBuy = qtd;
+  buy.lostValue = 0;
+  buy.buyPrice = stock.current.toFixed(2);
+  buy.qtdPercent = 0;
+  buy.lostPercent = 0;
+  buy.expireDate = tomorrow();
+
+  return buy;
+}
 var prepareStockSellValues = function(stock){
 	stock.sellList =[];
 	stock.sellList.push(createSell(0, stock, 0.10, 0.25));
@@ -117,10 +130,18 @@ var prepareStockSellValues = function(stock){
 	stock.sellList.push(createSell(2, stock, 0.30, 0.5));
 }
 var prepareStockBuyValues = function(stock){
+	var magicNumber = 3;
 	stock.buyList = [];
-	stock.buyList.push(createBuy(0, stock, 0.02, 0.25));
-	stock.buyList.push(createBuy(1, stock, 0.04, 0.25));
-	stock.buyList.push(createBuy(2, stock, 0.06, 0.50));
+  	if(stock.qtd < 100){
+  		var qtdToBy = ((100 - stock.qtd)+magicNumber)/magicNumber | 0;
+    	stock.buyList.push(createMinimalQtdBuy(0,stock, qtdToBy));
+    	stock.buyList.push(createMinimalQtdBuy(1,stock, qtdToBy));
+    	stock.buyList.push(createMinimalQtdBuy(2,stock, qtdToBy));
+  	}else{
+  		stock.buyList.push(createBuy(0, stock, 0.02, 0.25));
+  		stock.buyList.push(createBuy(1, stock, 0.04, 0.25));
+		stock.buyList.push(createBuy(2, stock, 0.06, 0.50));
+  	}
 }
 var preparePortfolioToSave = function(portfolio){
 	for(var index in portfolio.stocks){
