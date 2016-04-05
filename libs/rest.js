@@ -20,10 +20,10 @@ var getTimeDescription = function(){
     return mm+'_'+dd+'_'+yyyy;
 }
 function nextFriday() {
-  return "18/03/2016";
+  return "08/04/2016";
 }
 function tomorrow(){
-	return '18/03/2016';
+	return '05/04/2016';
 }
 var saveSetting = function(query, settingName){
 	query.server = getTimeDescription();
