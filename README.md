@@ -4,9 +4,9 @@
 
 `npm install`
 
-`make server-run`
+`make server_run`
 
-`make backend-run`
+`make backend_run`
 
 ## Portfolio (Carteira)
 
